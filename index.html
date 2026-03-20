@@ -54,16 +54,31 @@
   /* Gradient header */
   .header {
     padding: 16px 20px 12px;
-    position: sticky;
-    top: 0;
-    background: linear-gradient(180deg, var(--bg) 60%, transparent);
-    z-index: 50;
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(15, 15, 26, 0.65);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   .header h1 {
     font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+    background: linear-gradient(
+      110deg,
+      #7c3aed 0%,
+      #a78bfa 20%,
+      #ec4899 42%,
+      rgba(245, 210, 255, 0.9) 50%,
+      #ec4899 58%,
+      #a78bfa 80%,
+      #7c3aed 100%
+    );
+    background-size: 250% auto;
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: shimmerTitle 9s ease-in-out infinite;
+  }
+  @keyframes shimmerTitle {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
   }
   .header .date-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
 
@@ -72,8 +87,10 @@
 
   /* Weather widget */
   .weather-widget {
-    background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.12));
-    border: 1px solid rgba(6,182,212,0.2);
+    background: linear-gradient(135deg, rgba(6,182,212,0.10), rgba(124,58,237,0.10));
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(6,182,212,0.18);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
     border-radius: 16px; padding: 14px 16px; margin-bottom: 16px;
     display: flex; align-items: center; gap: 14px;
   }
@@ -91,13 +108,16 @@
   .tab-content { display: none; padding: 8px 20px 20px; position: relative; z-index: 1; transform: translateZ(0); }
   .tab-content.active { display: block; }
 
-  /* Cards */
+  /* Cards — glassmorphism */
   .card {
-    background: var(--card);
+    background: rgba(30, 30, 60, 0.45);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border-radius: var(--radius);
     padding: 16px;
     margin-bottom: 12px;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07);
   }
 
   /* ===== SUMMARY CARDS ===== */
@@ -105,6 +125,8 @@
   .summary-card {
     flex: 1; border-radius: 14px; padding: 14px 12px;
     text-align: center; position: relative; overflow: hidden;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
   }
   .summary-card::before {
     content: ''; position: absolute; inset: 0; opacity: 0.12; border-radius: 14px;
@@ -126,8 +148,12 @@
   }
   .agenda-item {
     display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-    background: var(--card); border-radius: 12px; margin-bottom: 8px;
-    border: 1px solid var(--border);
+    background: rgba(30, 30, 60, 0.4);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-radius: 12px; margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative; overflow: hidden;
   }
   .agenda-icon {
     width: 36px; height: 36px; border-radius: 10px;
@@ -210,8 +236,12 @@
   .week-strip::-webkit-scrollbar { display: none; }
   .week-day-card {
     flex: 1; min-width: 44px; text-align: center; padding: 10px 4px;
-    border-radius: 12px; cursor: pointer; background: var(--card);
-    border: 1px solid var(--border); transition: all 0.2s;
+    border-radius: 12px; cursor: pointer;
+    background: rgba(30, 30, 60, 0.4);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: all 0.2s; position: relative; overflow: hidden;
   }
   .week-day-card.has-entries:not(.today):not(.selected) {
     background: linear-gradient(135deg, var(--green), #059669);
@@ -376,7 +406,7 @@
 
   .photo-viewer {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-    z-index: 200; align-items: center; justify-content: center;
+    z-index: 500; align-items: center; justify-content: center;
     backdrop-filter: blur(4px);
   }
   .photo-viewer.active { display: flex; }
@@ -511,7 +541,7 @@
   /* Morning pop-up */
   .morning-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    z-index: 200; align-items: center; justify-content: center;
+    z-index: 450; align-items: center; justify-content: center;
     backdrop-filter: blur(8px);
   }
   .morning-overlay.active { display: flex; }
@@ -559,7 +589,7 @@
 
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    z-index: 100; align-items: flex-end; justify-content: center;
+    z-index: 400; align-items: flex-end; justify-content: center;
     backdrop-filter: blur(4px);
   }
   .modal-overlay.active { display: flex; }
@@ -600,12 +630,12 @@
     background: linear-gradient(135deg, var(--accent), var(--pink));
     color: #fff; border: none; font-size: 28px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 20px var(--accent-glow); cursor: pointer; z-index: 40;
+    box-shadow: 0 4px 20px var(--accent-glow); cursor: pointer; z-index: 200;
   }
   .fab:active { transform: scale(0.92); }
   .fab-menu {
     position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 82px);
-    right: 20px; display: none; flex-direction: column; gap: 10px; z-index: 41;
+    right: 20px; display: none; flex-direction: column; gap: 10px; z-index: 201;
     align-items: flex-end;
   }
   .fab-menu.active { display: flex; }
@@ -630,14 +660,15 @@
   .fab-menu-btn.event-btn { background: linear-gradient(135deg, var(--cyan), #0891b2); }
   .fab-menu-btn.appt-btn { background: linear-gradient(135deg, var(--accent), #6d28d9); }
   .fab-menu-btn.note-btn { background: linear-gradient(135deg, var(--green), #059669); }
-  .fab-overlay { position: fixed; inset: 0; z-index: 39; display: none; }
+  .fab-overlay { position: fixed; inset: 0; z-index: 199; display: none; }
   .fab-overlay.active { display: block; }
 
   /* Bottom nav */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(15,15,26,0.92); backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border);
+    background: rgba(10, 10, 22, 0.7); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
     display: flex; justify-content: flex-start; align-items: center;
     height: calc(var(--nav-height) + var(--safe-bottom));
     padding-bottom: var(--safe-bottom);
@@ -677,7 +708,10 @@
   .notes-recur-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
   .recur-picker {
     display: none; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
-    padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--border);
+    padding: 12px;
+    background: rgba(30, 30, 60, 0.45);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-radius: 12px; border: 1px solid rgba(255,255,255,0.09);
   }
   .recur-picker.open { display: flex; }
   .recur-option {
@@ -706,6 +740,73 @@
   }
   .day-notes-area:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
   .day-notes-area::placeholder { color: var(--text-secondary); }
+
+  /* ===== DAY DETAIL OVERLAY ===== */
+  /* ===== RIPPLE TAP EFFECT ===== */
+  .ripple-wave {
+    position: absolute; border-radius: 50%; pointer-events: none;
+    background: rgba(255,255,255,0.18);
+    transform: scale(0); animation: rippleExpand 0.55s ease-out forwards;
+  }
+  @keyframes rippleExpand {
+    to { transform: scale(4); opacity: 0; }
+  }
+
+  /* Swipe slide animation */
+  @keyframes slideInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes slideInLeft  { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:translateX(0); } }
+  .swipe-in-right { animation: slideInRight 0.22s ease-out both; }
+  .swipe-in-left  { animation: slideInLeft  0.22s ease-out both; }
+
+  .day-detail-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg); z-index: 75;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto; overflow-x: hidden;
+    padding-bottom: 100px;
+  }
+  .day-detail-overlay.open { transform: translateY(0); }
+  .day-detail-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 12px;
+    background: rgba(15, 15, 26, 0.65);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .day-detail-back {
+    background: none; border: none; color: var(--accent);
+    font-size: 24px; padding: 4px 10px 4px 4px;
+    cursor: pointer; line-height: 1; border-radius: 8px; flex-shrink: 0;
+  }
+  .day-detail-back:active { background: var(--accent-light); }
+  .day-detail-header-text { flex: 1; min-width: 0; }
+  .day-detail-title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .day-detail-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .day-detail-body { padding: 16px; }
+  .delete-btn {
+    background: none; border: none; color: var(--pink); font-size: 20px;
+    cursor: pointer; padding: 4px 8px; opacity: 0.75; border-radius: 6px;
+    line-height: 1; flex-shrink: 0;
+  }
+  .delete-btn:active { opacity: 1; background: rgba(236,72,153,0.12); }
+  .notes-clear-btn {
+    background: none; border: 1px solid var(--border); color: var(--text-secondary);
+    font-size: 12px; cursor: pointer; padding: 3px 10px;
+    border-radius: 6px; margin-left: auto;
+  }
+  .notes-clear-btn:active { color: var(--pink); border-color: var(--pink); }
+  .day-detail-fab {
+    position: fixed; bottom: 24px; right: 20px;
+    width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    color: #fff; border: none; font-size: 28px;
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px var(--accent-glow); cursor: pointer; z-index: 76;
+  }
+  .day-detail-overlay.open .day-detail-fab { display: flex; }
 
   /* ===== CONFETTI ===== */
   .confetti-container {
@@ -991,6 +1092,38 @@
     Tickets
   </button>
 </nav>
+
+<!-- DAY DETAIL OVERLAY -->
+<div class="day-detail-overlay" id="dayDetailOverlay">
+  <div class="day-detail-header">
+    <button class="day-detail-back" onclick="closeDayDetail()">&#8592;</button>
+    <div class="day-detail-header-text">
+      <div class="day-detail-title" id="dayDetailTitle"></div>
+      <div class="day-detail-subtitle" id="dayDetailSubtitle"></div>
+    </div>
+  </div>
+  <div class="day-detail-body">
+    <div class="summary-row">
+      <div class="summary-card" style="border-color:rgba(124,58,237,0.2);background:var(--accent-light);">
+        <div class="num" id="ddSumAppts" style="color:var(--accent);">0</div>
+        <div class="label">Appointments</div>
+      </div>
+      <div class="summary-card sc-events">
+        <div class="num" id="ddSumEvents">0</div>
+        <div class="label">Events</div>
+      </div>
+    </div>
+    <div id="dayDetailAgenda"></div>
+    <div class="day-notes-section">
+      <div style="display:flex;align-items:center;margin-bottom:8px;">
+        <div class="day-notes-label" style="margin-bottom:0;">Notes</div>
+        <button class="notes-clear-btn" onclick="clearDayDetailNote()">Clear</button>
+      </div>
+      <textarea class="day-notes-area" id="dayDetailNotes" placeholder="Other stuff..." oninput="saveDayDetailNotes()" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
+    </div>
+  </div>
+  <button class="day-detail-fab" onclick="toggleFabMenu()">+</button>
+</div>
 
 <!-- Modal: Add Event -->
 <div class="morning-overlay" id="morningPopup">
@@ -1428,6 +1561,129 @@ function renderAll() {
   renderCleaning();
   updateSummary();
   loadDayNotes();
+  if (document.getElementById('dayDetailOverlay') &&
+      document.getElementById('dayDetailOverlay').classList.contains('open')) {
+    renderDayDetailContent();
+  }
+}
+
+// ===== DAY DETAIL OVERLAY =====
+let dayDetailDate = '';
+
+function openDayDetail(dateStr, swipeDir) {
+  const isAlreadyOpen = document.getElementById('dayDetailOverlay').classList.contains('open');
+  dayDetailDate = dateStr;
+  const d = new Date(dateStr + 'T00:00:00');
+  document.getElementById('dayDetailTitle').textContent = formatDate(dateStr);
+  document.getElementById('dayDetailSubtitle').textContent =
+    d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  renderDayDetailContent();
+  document.getElementById('dayDetailOverlay').classList.add('open');
+  document.getElementById('fabBtn').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+  // Animate the body content on day swipe
+  if (isAlreadyOpen && swipeDir) {
+    const body = document.getElementById('dayDetailAgenda').parentElement;
+    body.classList.remove('swipe-in-right','swipe-in-left');
+    void body.offsetWidth;
+    body.classList.add(swipeDir === 'next' ? 'swipe-in-right' : 'swipe-in-left');
+  }
+}
+
+function closeDayDetail() {
+  document.getElementById('dayDetailOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  closeFabMenu();
+  const fab = document.getElementById('fabBtn');
+  fab.style.display = (currentTab === 'today' || currentTab === 'calendar' || currentTab === 'week') ? 'flex' : 'none';
+  renderAll();
+}
+
+function renderDayDetailContent() {
+  const dateStr = dayDetailDate;
+  const events = (data.events[dateStr] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const appts = data.appointments.filter(a => a.date === dateStr).sort((a,b) => a.time.localeCompare(b.time));
+  const noteText = data.dayNotes[dateStr] !== undefined
+    ? data.dayNotes[dateStr]
+    : (getRecurringNote(dateStr) ? getRecurringNote(dateStr).text : '');
+
+  document.getElementById('ddSumAppts').textContent = appts.length;
+  document.getElementById('ddSumEvents').textContent = events.length;
+
+  let html = '';
+
+  if (events.length > 0) {
+    html += '<div class="agenda-section"><h3>Events</h3>';
+    events.forEach((e, i) => {
+      html += `<div class="agenda-item ${e.done ? 'done-item' : ''}">
+        <div class="agenda-icon event" style="background:${e.color || 'var(--cyan-light)'}22;" onclick="toggleEventDone('${dateStr}',${i}); renderDayDetailContent();">
+          <div style="width:10px;height:10px;border-radius:50%;background:${e.color || 'var(--cyan)'}"></div>
+        </div>
+        <div class="agenda-text" onclick="toggleEventDone('${dateStr}',${i}); renderDayDetailContent();" style="cursor:pointer;">
+          <div class="title ${e.done ? 'struck' : ''}">${escHtml(e.name)}</div>
+          <div class="subtitle">${e.time || 'All day'}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteDayDetailEvent('${dateStr}',${i})" title="Delete">&#215;</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (appts.length > 0) {
+    html += '<div class="agenda-section"><h3>Appointments</h3>';
+    appts.forEach(a => {
+      html += `<div class="agenda-item ${a.done ? 'done-item' : ''}">
+        <div class="agenda-icon" style="background:var(--accent-light);" onclick="toggleApptDone(${a.id}); renderDayDetailContent();">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--accent)"></div>
+        </div>
+        <div class="agenda-text" onclick="toggleApptDone(${a.id}); renderDayDetailContent();" style="cursor:pointer;">
+          <div class="title ${a.done ? 'struck' : ''}">${escHtml(a.title)}</div>
+          <div class="subtitle">${formatApptTime(a.time)}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteDayDetailAppt(${a.id})" title="Delete">&#215;</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (!events.length && !appts.length && !noteText.trim()) {
+    html = '<div class="empty-state"><div class="emoji">&#10024;</div><p>Nothing planned yet. Tap + to add something.</p></div>';
+  }
+
+  document.getElementById('dayDetailAgenda').innerHTML = html;
+
+  const notesArea = document.getElementById('dayDetailNotes');
+  if (document.activeElement !== notesArea) {
+    notesArea.value = noteText;
+  }
+}
+
+function deleteDayDetailEvent(dateStr, idx) {
+  if (!data.events[dateStr]) return;
+  data.events[dateStr].splice(idx, 1);
+  if (data.events[dateStr].length === 0) delete data.events[dateStr];
+  save();
+  renderDayDetailContent();
+}
+
+function deleteDayDetailAppt(id) {
+  data.appointments = data.appointments.filter(a => a.id !== id);
+  save();
+  renderDayDetailContent();
+}
+
+function saveDayDetailNotes() {
+  if (!dayDetailDate) return;
+  data.dayNotes[dayDetailDate] = document.getElementById('dayDetailNotes').value;
+  save();
+}
+
+function clearDayDetailNote() {
+  if (!dayDetailDate) return;
+  delete data.dayNotes[dayDetailDate];
+  save();
+  document.getElementById('dayDetailNotes').value = '';
+  renderDayDetailContent();
 }
 
 // ===== TABS =====
@@ -1469,6 +1725,7 @@ function openModal() {
 }
 
 function getContextDate() {
+  if (document.getElementById('dayDetailOverlay').classList.contains('open')) return dayDetailDate;
   if (currentTab === 'week') return weekSelectedDate;
   if (currentTab === 'calendar') return selectedDate;
   return dateKey(today);
@@ -1629,6 +1886,10 @@ function changeWeek(delta) {
   weekStart.setDate(weekStart.getDate() + (delta * 7));
   weekSelectedDate = dateKey(weekStart);
   renderWeek();
+  const strip = document.getElementById('weekStrip');
+  strip.classList.remove('swipe-in-right','swipe-in-left');
+  void strip.offsetWidth; // reflow
+  strip.classList.add(delta > 0 ? 'swipe-in-right' : 'swipe-in-left');
 }
 
 function renderWeek() {
@@ -1716,6 +1977,7 @@ function selectWeekDay(key) {
   weekSelectedDate = key;
   renderWeek();
   loadNoteIntoTextarea('weekNotes', key);
+  openDayDetail(key);
 }
 
 // ===== CALENDAR =====
@@ -1724,6 +1986,10 @@ function changeMonth(delta) {
   if (calMonth > 11) { calMonth = 0; calYear++; }
   if (calMonth < 0) { calMonth = 11; calYear--; }
   renderCalendar();
+  const grid = document.getElementById('calGrid');
+  grid.classList.remove('swipe-in-right','swipe-in-left');
+  void grid.offsetWidth;
+  grid.classList.add(delta > 0 ? 'swipe-in-right' : 'swipe-in-left');
 }
 
 function renderCalendar() {
@@ -1762,7 +2028,7 @@ function renderCalendar() {
     if (hasEntries) {
       const dot = document.createElement('div'); dot.className = 'dot'; el.appendChild(dot);
     }
-    el.onclick = () => { selectedDate = key; renderCalendar(); renderDayEvents(); updateSummary(); };
+    el.onclick = () => { selectedDate = key; renderCalendar(); renderDayEvents(); updateSummary(); openDayDetail(key); };
     grid.appendChild(el);
   }
   const totalCells = startDay + daysInMonth;
@@ -1828,7 +2094,7 @@ function saveEvent() {
   const name = document.getElementById('eventName').value.trim();
   if (!name) return;
   const time = document.getElementById('eventTime').value;
-  const targetDate = (currentTab === 'week') ? weekSelectedDate : selectedDate;
+  const targetDate = getContextDate();
   if (!data.events[targetDate]) data.events[targetDate] = [];
   data.events[targetDate].push({ name, time, color: selectedColor });
   save(); closeModal(); renderAll();
@@ -2311,6 +2577,94 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
 // Close modals on backdrop
 document.getElementById('eventModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 document.getElementById('noteModal').addEventListener('click', function(e) { if (e.target === this) closeNoteModal(); });
+
+// ===== RIPPLE TAP EFFECT =====
+(function() {
+  const RIPPLE_SELECTORS = [
+    '.agenda-item', '.week-day-card', '.cal-day',
+    '.summary-card', '.nav-item', '.fab-menu-btn',
+    '.day-detail-back', '.recur-option', '.shop-tab',
+    '.clean-action', '.shop-action', '.appt-btn-row button'
+  ];
+
+  function spawnRipple(el, x, y) {
+    if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    el.style.overflow = 'hidden';
+    const rect = el.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 1.4;
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple-wave';
+    ripple.style.cssText = `width:${size}px;height:${size}px;left:${x - rect.left - size/2}px;top:${y - rect.top - size/2}px;`;
+    el.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  }
+
+  document.addEventListener('pointerdown', function(e) {
+    const target = e.target.closest(RIPPLE_SELECTORS.join(','));
+    if (target) spawnRipple(target, e.clientX, e.clientY);
+  }, { passive: true });
+})();
+
+// ===== SWIPE GESTURES =====
+(function() {
+  // Generic swipe listener: attach to an element, fire onLeft/onRight
+  // Only triggers if the swipe is clearly horizontal (dx > dy * 1.5) and long enough
+  function addSwipe(el, onLeft, onRight) {
+    let x0 = null, y0 = null, startTime = null;
+    el.addEventListener('touchstart', function(e) {
+      if (e.touches.length !== 1) return;
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+      startTime = Date.now();
+    }, { passive: true });
+    el.addEventListener('touchend', function(e) {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      const dy = e.changedTouches[0].clientY - y0;
+      const dt = Date.now() - startTime;
+      x0 = null; y0 = null;
+      // Must be fast enough (<500ms), long enough (>45px), and more horizontal than vertical
+      if (dt > 500 || Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+      if (dx < 0) onLeft();   // swipe left  → go forward
+      else        onRight();  // swipe right → go back
+    }, { passive: true });
+  }
+
+  // Week tab: swipe changes week
+  addSwipe(
+    document.getElementById('tab-week'),
+    () => changeWeek(1),
+    () => changeWeek(-1)
+  );
+
+  // Calendar tab: swipe changes month
+  addSwipe(
+    document.getElementById('tab-calendar'),
+    () => changeMonth(1),
+    () => changeMonth(-1)
+  );
+
+  // Day detail overlay: swipe left/right opens adjacent day
+  document.getElementById('dayDetailOverlay').addEventListener('touchstart', function(e) {
+    if (e.touches.length !== 1) return;
+    this._sx = e.touches[0].clientX;
+    this._sy = e.touches[0].clientY;
+    this._st = Date.now();
+  }, { passive: true });
+  document.getElementById('dayDetailOverlay').addEventListener('touchend', function(e) {
+    if (this._sx === undefined) return;
+    const dx = e.changedTouches[0].clientX - this._sx;
+    const dy = e.changedTouches[0].clientY - this._sy;
+    const dt = Date.now() - this._st;
+    delete this._sx; delete this._sy; delete this._st;
+    if (dt > 500 || Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    // Move to next or previous day
+    const dir = dx < 0 ? 'next' : 'prev';
+    const d = new Date(dayDetailDate + 'T00:00:00');
+    d.setDate(d.getDate() + (dx < 0 ? 1 : -1));
+    openDayDetail(d.toISOString().slice(0, 10), dir);
+  }, { passive: true });
+})();
 
 init();
 </script>
