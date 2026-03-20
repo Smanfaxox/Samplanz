@@ -722,10 +722,6 @@
       <div class="num" id="sumEvents">0</div>
       <div class="label">Events</div>
     </div>
-    <div class="summary-card sc-habits">
-      <div class="num" id="sumHabits">0</div>
-      <div class="label">To buy</div>
-    </div>
   </div>
   <div id="todayAgenda"></div>
   <div class="day-notes-section">
@@ -895,6 +891,10 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
     Costs
   </button>
+  <button class="nav-item" onclick="window.open('https://docs.google.com/spreadsheets/d/1Uj700MZknRnD6gaqRFfiGCtDm3-ru-qf0KdLXUcnWjU/edit?gid=1258217614#gid=1258217614', '_blank')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V6a2 2 0 012-2h16a2 2 0 012 2v3"/><path d="M2 9h20"/><rect x="4" y="9" width="16" height="11" rx="1"/><path d="M9 13h6"/></svg>
+    Tickets
+  </button>
 </nav>
 
 <!-- Modal: Add Event -->
@@ -966,8 +966,20 @@ function saveDayNotes(textareaId) {
   save();
 }
 
+function applyMondayDefault(key) {
+  if (!(key in data.dayNotes)) {
+    const d = new Date(key + 'T00:00:00');
+    if (d.getDay() === 1) { // Monday
+      data.dayNotes[key] = 'Mum and Dad - Tablets';
+      save();
+    }
+  }
+}
+
 function loadDayNotes() {
   const todayKey = dateKey(today);
+  applyMondayDefault(todayKey);
+  applyMondayDefault(weekSelectedDate);
   document.getElementById('todayNotes').value = data.dayNotes[todayKey] || '';
   document.getElementById('weekNotes').value = data.dayNotes[weekSelectedDate] || '';
 }
@@ -1092,8 +1104,6 @@ function showMorningPopup() {
   const events = (data.events[todayKey] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
   const appts = data.appointments.filter(a => a.date === todayKey).sort((a,b) => a.time.localeCompare(b.time));
   const tasks = data.tasks.filter(t => !t.done);
-  const cleanLeft = data.cleaning.filter(c => c.completedWeek !== getSaturday());
-
   let html = '';
 
   // Weather in morning popup
@@ -1147,15 +1157,6 @@ function showMorningPopup() {
     });
     if (tasks.length > 5) html += `<div class="morning-empty">+ ${tasks.length - 5} more</div>`;
     html += '</div>';
-  }
-
-  // Cleaning
-  if (cleanLeft.length > 0) {
-    html += '<div class="morning-section"><div class="morning-section-title">&#129529; Cleaning</div>';
-    html += `<div class="morning-item">
-      <div class="morning-item-dot" style="background:var(--green)"></div>
-      <div class="morning-item-text">${cleanLeft.length} task${cleanLeft.length > 1 ? 's' : ''} remaining this week</div>
-    </div></div>`;
   }
 
   if (!html) {
@@ -1306,21 +1307,8 @@ function renderTodayAgenda() {
     html += '</div>';
   }
 
-  const cleanLeft = data.cleaning.filter(c => c.completedWeek !== getSaturday());
-  if (cleanLeft.length > 0) {
-    html += '<div class="agenda-section"><h3>Cleaning to do</h3>';
-    cleanLeft.slice(0, 5).forEach(c => {
-      html += `<div class="agenda-item" onclick="toggleCleanTask(${c.id}); renderAll();">
-        <div class="agenda-icon" style="background:var(--orange-light);"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--orange)"></div></div>
-        <div class="agenda-text"><div class="title">${escHtml(c.text)}</div><div class="subtitle">Tap to complete</div></div>
-      </div>`;
-    });
-    if (cleanLeft.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${cleanLeft.length - 5} more tasks</div>`;
-    html += '</div>';
-  }
-
-  if (!events.length && !tasks.length && !todayAppts.length && !cleanLeft.length) {
-    html = '<div class="empty-state"><div class="emoji">&#10024;</div><p>Your day is clear! Add some events, tasks, or shopping items to get started.</p></div>';
+  if (!events.length && !tasks.length && !todayAppts.length) {
+    html = '<div class="empty-state"><div class="emoji">&#10024;</div><p>Your day is clear! Add some events or tasks to get started.</p></div>';
   }
 
   container.innerHTML = html;
@@ -1369,8 +1357,6 @@ function renderWeek() {
   const events = (data.events[weekSelectedDate] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
   const activeTasks = data.tasks.filter(t => !t.done);
   const dayAppts = data.appointments.filter(a => a.date === weekSelectedDate).sort((a,b) => a.time.localeCompare(b.time));
-  const cleanLeft = data.cleaning.filter(c => c.completedWeek !== getSaturday());
-
   let html = '';
 
   if (events.length > 0) {
@@ -1410,19 +1396,7 @@ function renderWeek() {
     html += '</div>';
   }
 
-  if (cleanLeft.length > 0) {
-    html += '<div class="agenda-section"><h3>Cleaning to do</h3>';
-    cleanLeft.slice(0, 5).forEach(c => {
-      html += `<div class="agenda-item" onclick="toggleCleanTask(${c.id}); renderAll();">
-        <div class="agenda-icon" style="background:var(--orange-light);"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--orange)"></div></div>
-        <div class="agenda-text"><div class="title">${escHtml(c.text)}</div><div class="subtitle">Tap to complete</div></div>
-      </div>`;
-    });
-    if (cleanLeft.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${cleanLeft.length - 5} more tasks</div>`;
-    html += '</div>';
-  }
-
-  if (!events.length && !dayAppts.length && !activeTasks.length && !cleanLeft.length) {
+  if (!events.length && !dayAppts.length && !activeTasks.length) {
     html = '<div class="empty-state"><div class="emoji">&#10024;</div><p>Nothing for this day yet. Tap + to add an event.</p></div>';
   }
 
@@ -1432,6 +1406,8 @@ function renderWeek() {
 function selectWeekDay(key) {
   weekSelectedDate = key;
   renderWeek();
+  applyMondayDefault(key);
+  document.getElementById('weekNotes').value = data.dayNotes[key] || '';
 }
 
 // ===== CALENDAR =====
@@ -1492,20 +1468,43 @@ function renderCalendar() {
 }
 
 function renderDayEvents() {
-  const events = data.events[selectedDate] || [];
+  const events = (data.events[selectedDate] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const appts = data.appointments.filter(a => a.date === selectedDate).sort((a,b) => a.time.localeCompare(b.time));
   document.getElementById('dayEventsTitle').textContent = formatDate(selectedDate);
   const list = document.getElementById('dayEventsList');
-  if (events.length === 0) {
-    list.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p>No events for this day</p></div>';
-    return;
+
+  let html = '';
+
+  if (events.length > 0) {
+    html += '<div class="agenda-section"><h3>Events</h3>';
+    events.forEach((e, i) => {
+      html += `<div class="agenda-item ${e.done ? 'done-item' : ''}" onclick="toggleEventDone('${selectedDate}',${i});" style="cursor:pointer;">
+        <div class="agenda-icon event" style="background:${e.color || 'var(--cyan-light)'}22;">
+          <div style="width:10px;height:10px;border-radius:50%;background:${e.color || 'var(--cyan)'}"></div>
+        </div>
+        <div class="agenda-text"><div class="title ${e.done ? 'struck' : ''}">${escHtml(e.name)}</div><div class="subtitle">${e.time || 'All day'}</div></div>
+        <button class="event-delete" onclick="event.stopPropagation(); deleteEvent('${selectedDate}',${i}); renderAll();">\u00d7</button>
+      </div>`;
+    });
+    html += '</div>';
   }
-  list.innerHTML = events.sort((a,b) => (a.time||'').localeCompare(b.time||''))
-    .map((e, i) => `<div class="event-item" onclick="toggleEventDone('${selectedDate}',${i});" style="cursor:pointer;${e.done ? 'opacity:0.5;' : ''}">
-      <div class="event-dot" style="background:${e.color || '#7c3aed'}"></div>
-      <div class="event-time">${e.time || 'All day'}</div>
-      <div class="event-title" style="${e.done ? 'text-decoration:line-through;color:var(--text-secondary)' : ''}">${escHtml(e.name)}</div>
-      <button class="event-delete" onclick="event.stopPropagation(); deleteEvent('${selectedDate}',${i}); renderAll();">\u00d7</button>
-    </div>`).join('');
+
+  if (appts.length > 0) {
+    html += '<div class="agenda-section"><h3>Appointments</h3>';
+    appts.forEach(a => {
+      html += `<div class="agenda-item ${a.done ? 'done-item' : ''}" onclick="toggleApptDone(${a.id});" style="cursor:pointer;">
+        <div class="agenda-icon" style="background:var(--accent-light);"><div style="width:10px;height:10px;border-radius:50%;background:var(--accent)"></div></div>
+        <div class="agenda-text"><div class="title ${a.done ? 'struck' : ''}">${escHtml(a.title)}</div><div class="subtitle">${formatApptTime(a.time)}</div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (!events.length && !appts.length) {
+    html = '<div class="empty-state" style="padding:20px 0;"><div class="emoji">&#128197;</div><p>Nothing planned for this day. Tap + to add an event.</p></div>';
+  }
+
+  list.innerHTML = html;
 }
 
 function saveEvent() {
@@ -1987,8 +1986,6 @@ function updateSummary() {
   const todayKey = dateKey(today);
   document.getElementById('sumTasks').textContent = data.tasks.filter(t => !t.done).length;
   document.getElementById('sumEvents').textContent = (data.events[todayKey] || []).length;
-  const shopLeft = data.shopping.filter(s => !s.done).length;
-  document.getElementById('sumHabits').textContent = shopLeft;
 }
 
 // ===== UTILS =====
