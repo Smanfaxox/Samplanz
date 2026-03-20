@@ -687,6 +687,13 @@
   }
   .recur-option:active { background: var(--accent-light); }
   .recur-option.remove { color: var(--red); border-color: rgba(239,68,68,0.3); }
+  .modal-repeat-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .modal-repeat-opt {
+    padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--bg-secondary); font-size: 13px; cursor: pointer;
+    color: var(--text-secondary); font-weight: 500; font-family: inherit; transition: all 0.2s;
+  }
+  .modal-repeat-opt.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
   .day-notes-area {
     width: 100%; min-height: 100px; padding: 14px; border-radius: 12px;
     border: 1px solid var(--border); font-size: 15px; background: var(--bg-secondary);
@@ -818,16 +825,7 @@
   </div>
   <div id="todayAgenda"></div>
   <div class="day-notes-section">
-    <div class="notes-header">
-      <div class="day-notes-label">Notes</div>
-      <button class="notes-recur-btn" id="todayNotesRecurBtn" onclick="toggleRecurPicker('todayNotes')">&#128257; Repeat</button>
-    </div>
-    <div class="recur-picker" id="todayNotesRecurPicker">
-      <button class="recur-option" onclick="setRecurring('todayNotes','weekly')">Every week</button>
-      <button class="recur-option" onclick="setRecurring('todayNotes','monthly')">Every month</button>
-      <button class="recur-option remove" onclick="removeRecurring('todayNotes')">Remove</button>
-      <button class="recur-option" onclick="closeRecurPicker('todayNotes')">Cancel</button>
-    </div>
+    <div class="day-notes-label">Notes</div>
     <textarea class="day-notes-area" id="todayNotes" placeholder="Other stuff..." oninput="saveDayNotes('todayNotes')" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
   </div>
 </div>
@@ -1034,6 +1032,12 @@
     <select id="apptModalTime">
       <option value="">Select time...</option>
     </select>
+    <label>Repeat</label>
+    <div class="modal-repeat-row">
+      <button class="modal-repeat-opt active" onclick="selectRepeat(this,'appt','none')">Never</button>
+      <button class="modal-repeat-opt" onclick="selectRepeat(this,'appt','weekly')">Every week</button>
+      <button class="modal-repeat-opt" onclick="selectRepeat(this,'appt','monthly')">Every month</button>
+    </div>
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeApptModal()">Cancel</button>
       <button class="modal-save" onclick="saveApptFromModal()">Add Appointment</button>
@@ -1049,6 +1053,12 @@
     <label>Note</label>
     <textarea id="noteModalText" placeholder="Write your note..." autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"
       style="width:100%;min-height:100px;padding:12px 14px;border-radius:12px;border:1px solid var(--border);font-size:15px;margin-bottom:14px;font-family:inherit;background:var(--bg-secondary);outline:none;color:var(--text);resize:vertical;line-height:1.6;"></textarea>
+    <label>Repeat</label>
+    <div class="modal-repeat-row">
+      <button class="modal-repeat-opt active" onclick="selectRepeat(this,'note','none')">Never</button>
+      <button class="modal-repeat-opt" onclick="selectRepeat(this,'note','weekly')">Every week</button>
+      <button class="modal-repeat-opt" onclick="selectRepeat(this,'note','monthly')">Every month</button>
+    </div>
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeNoteModal()">Cancel</button>
       <button class="modal-save" style="background:linear-gradient(135deg,var(--green),#059669);" onclick="saveNoteFromModal()">Add Note</button>
@@ -1424,10 +1434,32 @@ function getContextDate() {
   return dateKey(today);
 }
 
+// ===== REPEAT SELECTOR (shared by modals) =====
+let apptRepeat = 'none';
+let noteRepeat = 'none';
+
+function selectRepeat(btn, modalType, value) {
+  const row = btn.closest('.modal-repeat-row');
+  row.querySelectorAll('.modal-repeat-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (modalType === 'appt') apptRepeat = value;
+  if (modalType === 'note') noteRepeat = value;
+}
+
+function resetRepeatBtns(modalType) {
+  const modalId = modalType === 'appt' ? 'apptModal' : 'noteModal';
+  document.querySelectorAll(`#${modalId} .modal-repeat-opt`).forEach((b, i) => {
+    b.classList.toggle('active', i === 0);
+  });
+  if (modalType === 'appt') apptRepeat = 'none';
+  if (modalType === 'note') noteRepeat = 'none';
+}
+
 function openApptModal() {
   document.getElementById('apptModal').classList.add('active');
   document.getElementById('apptModalDate').value = getContextDate();
   document.getElementById('apptModalTitle').focus();
+  resetRepeatBtns('appt');
 }
 function closeApptModal() {
   document.getElementById('apptModal').classList.remove('active');
@@ -1439,7 +1471,11 @@ function saveApptFromModal() {
   const date = document.getElementById('apptModalDate').value;
   const time = document.getElementById('apptModalTime').value;
   if (!title || !time || !date) return;
-  data.appointments.push({ id: Date.now(), title, time, date });
+  // Generate all occurrences
+  const dates = getRepeatDates(date, apptRepeat);
+  dates.forEach((d, i) => {
+    data.appointments.push({ id: Date.now() + i, title, time, date: d });
+  });
   data.appointments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   save(); closeApptModal(); renderAll();
 }
@@ -1449,6 +1485,7 @@ function openNoteModal() {
   document.getElementById('noteModal').classList.add('active');
   document.getElementById('noteModalDate').value = getContextDate();
   document.getElementById('noteModalText').focus();
+  resetRepeatBtns('note');
 }
 function closeNoteModal() {
   document.getElementById('noteModal').classList.remove('active');
@@ -1458,11 +1495,39 @@ function saveNoteFromModal() {
   const text = document.getElementById('noteModalText').value.trim();
   const date = document.getElementById('noteModalDate').value;
   if (!text || !date) return;
-  const existing = data.dayNotes[date] || '';
-  data.dayNotes[date] = existing ? existing + '\n' + text : text;
-  save();
-  closeNoteModal();
-  loadDayNotes();
+  if (noteRepeat !== 'none') {
+    // Save as a recurring note
+    const d = new Date(date + 'T00:00:00');
+    data.recurringNotes = data.recurringNotes.filter(r =>
+      !(r.type === 'weekly' && noteRepeat === 'weekly' && r.dayOfWeek === d.getDay()) &&
+      !(r.type === 'monthly' && noteRepeat === 'monthly' && r.dayOfMonth === d.getDate())
+    );
+    data.recurringNotes.push({
+      id: Date.now(),
+      type: noteRepeat,
+      dayOfWeek: noteRepeat === 'weekly' ? d.getDay() : undefined,
+      dayOfMonth: noteRepeat === 'monthly' ? d.getDate() : undefined,
+      text
+    });
+  } else {
+    const existing = data.dayNotes[date] || '';
+    data.dayNotes[date] = existing ? existing + '\n' + text : text;
+  }
+  save(); closeNoteModal(); renderAll(); loadDayNotes();
+}
+
+function getRepeatDates(startDate, repeat) {
+  if (repeat === 'none') return [startDate];
+  const dates = [];
+  const start = new Date(startDate + 'T00:00:00');
+  const limit = repeat === 'weekly' ? 104 : 24; // 2 years
+  for (let i = 0; i < limit; i++) {
+    const d = new Date(start);
+    if (repeat === 'weekly') d.setDate(d.getDate() + i * 7);
+    if (repeat === 'monthly') d.setMonth(d.getMonth() + i);
+    dates.push(dateKey(d));
+  }
+  return dates;
 }
 
 // ===== TODAY AGENDA =====
