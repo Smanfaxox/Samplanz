@@ -1085,6 +1085,46 @@ if (!data.recurringNotes) {
   save();
 }
 
+// ===== ONE-TIME IMPORT FROM WEEK PLANNER APP =====
+(function() {
+  if (localStorage.getItem('samplanz_imported_v1')) return;
+  const imported = {
+    "2026-03-16": "Kittens born 🐱🐱",
+    "2026-03-18": "8.45 bloods and pee dad\nContact lenses\nFags?",
+    "2026-03-19": "Red day",
+    "2026-03-20": "9.00 mum bloods and pee test",
+    "2026-03-23": "8.30 docs me\n9.40 dad ECG\n10.00\nDad for results of blood",
+    "2026-03-25": "Stay in. Lego.",
+    "2026-03-27": "11.45 dad cardiology\nSinead gym",
+    "2026-04-16": "2pm nurse Dad?",
+    "2026-05-07": "8.45 ophthalmologist",
+    "2026-05-10": "Bliss",
+    "2026-05-13": "10am Dad catheter change",
+    "2026-05-17": "Check in with Enrique for apartment WhatsApp.",
+    "2026-05-18": "Valencià",
+    "2026-05-19": "Valencià",
+    "2026-05-20": "Valencià",
+    "2026-05-21": "Valencià",
+    "2026-05-22": "Calpe",
+    "2026-05-23": "Home",
+    "2026-05-25": "Sabbatical",
+    "2026-05-26": "Sabbatical",
+    "2026-05-27": "Sabbatical",
+    "2026-05-28": "Sabbatical",
+    "2026-05-29": "Sabbatical",
+    "2026-06-01": "Look into next smear test"
+  };
+  for (const [date, text] of Object.entries(imported)) {
+    if (!data.dayNotes[date]) {
+      data.dayNotes[date] = text;
+    } else if (!data.dayNotes[date].includes(text)) {
+      data.dayNotes[date] = data.dayNotes[date] + '\n' + text;
+    }
+  }
+  save();
+  localStorage.setItem('samplanz_imported_v1', '1');
+})();
+
 // ===== RECURRING NOTES =====
 function getRecurringNote(dateStr) {
   if (!data.recurringNotes) return null;
