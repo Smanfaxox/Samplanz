@@ -333,6 +333,60 @@
   }
   .shop-action:active { background: var(--accent-light); }
 
+  /* ===== CLEANING LIST ===== */
+  .clean-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .clean-input-row input {
+    flex: 1; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+    font-size: 15px; background: var(--bg-secondary); outline: none; font-family: inherit;
+    color: var(--text);
+  }
+  .clean-input-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .clean-input-row input::placeholder { color: var(--text-secondary); }
+  .clean-input-row button {
+    padding: 12px 20px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .clean-input-row button:active { opacity: 0.85; }
+
+  .clean-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .clean-item:last-child { border-bottom: none; }
+  .clean-check {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-light);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .clean-check.checked {
+    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    border-color: transparent;
+  }
+  .clean-check.checked::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 800; }
+  .clean-text { flex: 1; font-size: 15px; }
+  .clean-text.done { text-decoration: line-through; color: var(--text-secondary); }
+  .clean-delete { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 4px; }
+
+  .clean-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+  .clean-action {
+    padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--card); font-size: 13px; cursor: pointer; color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .clean-action:active { background: var(--accent-light); }
+  .clean-progress { margin-bottom: 16px; }
+  .clean-progress-bar {
+    height: 8px; border-radius: 4px; background: var(--bg-secondary);
+    overflow: hidden; margin-top: 8px;
+  }
+  .clean-progress-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    transition: width 0.3s ease;
+  }
+  .clean-progress-text { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
   /* ===== MODALS ===== */
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
@@ -510,6 +564,20 @@
   <div class="card" id="shopList"></div>
 </div>
 
+<!-- CLEANING TAB -->
+<div class="tab-content" id="tab-cleaning">
+  <div class="clean-progress" id="cleanProgress"></div>
+  <div class="clean-input-row">
+    <input type="text" id="cleanInput" placeholder="Add a cleaning task..." onkeydown="if(event.key==='Enter')addCleanTask()" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
+    <button onclick="addCleanTask()">Add</button>
+  </div>
+  <div class="clean-actions">
+    <button class="clean-action" onclick="resetCleanTasks()">Reset all</button>
+    <button class="clean-action" onclick="removeAllCleanTasks()">Remove all</button>
+  </div>
+  <div class="card" id="cleanList"></div>
+</div>
+
 <!-- FAB -->
 <button class="fab" id="fabBtn" onclick="openModal()">+</button>
 
@@ -539,6 +607,10 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
     Shop
   </button>
+  <button class="nav-item" onclick="switchTab('cleaning')" id="nav-cleaning">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22v-2a4 4 0 014-4h2"/><path d="M9 16l-3-3 9-9 3 3-9 9z"/><path d="M14.5 5.5l3 3"/><path d="M18 2l4 4"/></svg>
+    Clean
+  </button>
 </nav>
 
 <!-- Modal: Add Event -->
@@ -565,11 +637,12 @@ const STORAGE_KEY = 'samplanzData';
 let data = loadData();
 function loadData() {
   try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return { events: {}, tasks: [], notes: [], shopping: [] };
+  return { events: {}, tasks: [], notes: [], shopping: [], cleaning: [] };
 }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 // Migrate old data: if habits exist but no shopping, add shopping array
 if (!data.shopping) data.shopping = [];
+if (!data.cleaning) data.cleaning = [];
 
 // ===== STATE =====
 let currentTab = 'today';
@@ -645,6 +718,7 @@ function renderAll() {
   renderTasks();
   renderNotes();
   renderShopping();
+  renderCleaning();
   updateSummary();
 }
 
@@ -659,7 +733,7 @@ function switchTab(tab) {
   const fab = document.getElementById('fabBtn');
   fab.style.display = (tab === 'today' || tab === 'calendar' || tab === 'week') ? 'flex' : 'none';
 
-  const titles = { today: 'Samplanz', week: 'Weekly Planner', calendar: 'Calendar', tasks: 'Tasks', notes: 'Notes', shopping: 'Shopping List' };
+  const titles = { today: 'Samplanz', week: 'Weekly Planner', calendar: 'Calendar', tasks: 'Tasks', notes: 'Notes', shopping: 'Shopping List', cleaning: 'Cleaning' };
   document.getElementById('headerTitle').textContent = titles[tab];
   document.getElementById('greeting').style.display = tab === 'today' ? 'block' : 'none';
 }
@@ -718,7 +792,20 @@ function renderTodayAgenda() {
     html += '</div>';
   }
 
-  if (!events.length && !tasks.length && !shopItems.length) {
+  const cleanLeft = data.cleaning.filter(c => c.completedWeek !== getSaturday());
+  if (cleanLeft.length > 0) {
+    html += '<div class="agenda-section"><h3>Cleaning to do</h3>';
+    cleanLeft.slice(0, 5).forEach(c => {
+      html += `<div class="agenda-item" onclick="toggleCleanTask(${c.id}); renderAll();">
+        <div class="agenda-icon" style="background:var(--orange-light);"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--orange)"></div></div>
+        <div class="agenda-text"><div class="title">${escHtml(c.text)}</div><div class="subtitle">Tap to complete</div></div>
+      </div>`;
+    });
+    if (cleanLeft.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${cleanLeft.length - 5} more tasks</div>`;
+    html += '</div>';
+  }
+
+  if (!events.length && !tasks.length && !shopItems.length && !cleanLeft.length) {
     html = '<div class="empty-state"><div class="emoji">✨</div><p>Your day is clear! Add some events, tasks, or shopping items to get started.</p></div>';
   }
 
@@ -1034,6 +1121,102 @@ function renderShopping() {
         <div class="shop-check checked" onclick="toggleShopItem(${s.id})"></div>
         <div class="shop-text done">${escHtml(s.text)}</div>
         <button class="shop-delete" onclick="deleteShopItem(${s.id})">×</button>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+// ===== CLEANING (recurring every Saturday) =====
+function getSaturday() {
+  // Get the most recent Saturday (including today if it's Saturday)
+  const d = new Date(today);
+  const day = d.getDay(); // 0=Sun, 6=Sat
+  const diff = day >= 6 ? 0 : day + 1; // days since last Saturday
+  d.setDate(d.getDate() - diff);
+  return dateKey(d);
+}
+
+const currentWeekSat = getSaturday();
+
+// Auto-reset: clear completions from previous weeks
+function autoResetCleaning() {
+  data.cleaning.forEach(task => {
+    if (task.completedWeek && task.completedWeek !== currentWeekSat) {
+      task.completedWeek = null;
+    }
+  });
+  save();
+}
+autoResetCleaning();
+
+function addCleanTask() {
+  const input = document.getElementById('cleanInput');
+  const text = input.value.trim();
+  if (!text) return;
+  data.cleaning.push({ id: Date.now(), text, completedWeek: null });
+  save(); input.value = ''; renderAll();
+}
+
+function toggleCleanTask(id) {
+  const task = data.cleaning.find(c => c.id === id);
+  if (!task) return;
+  task.completedWeek = task.completedWeek === currentWeekSat ? null : currentWeekSat;
+  save(); renderAll();
+}
+
+function deleteCleanTask(id) {
+  data.cleaning = data.cleaning.filter(c => c.id !== id);
+  save(); renderAll();
+}
+
+function resetCleanTasks() {
+  data.cleaning.forEach(t => t.completedWeek = null);
+  save(); renderAll();
+}
+
+function removeAllCleanTasks() {
+  data.cleaning = [];
+  save(); renderAll();
+}
+
+function renderCleaning() {
+  const list = document.getElementById('cleanList');
+  const progressEl = document.getElementById('cleanProgress');
+
+  if (data.cleaning.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">🧹</div><p>Add your cleaning tasks — they\'ll reset every Saturday!</p></div>';
+    progressEl.innerHTML = '';
+    return;
+  }
+
+  const total = data.cleaning.length;
+  const done = data.cleaning.filter(c => c.completedWeek === currentWeekSat).length;
+  const pct = Math.round((done / total) * 100);
+
+  progressEl.innerHTML = `
+    <div class="clean-progress-text">${done}/${total} done this week${pct === 100 ? ' — all clean!' : ''}</div>
+    <div class="clean-progress-bar"><div class="clean-progress-fill" style="width:${pct}%"></div></div>
+  `;
+
+  const undone = data.cleaning.filter(c => c.completedWeek !== currentWeekSat);
+  const completed = data.cleaning.filter(c => c.completedWeek === currentWeekSat);
+
+  let html = '';
+  undone.forEach(c => {
+    html += `<div class="clean-item">
+      <div class="clean-check" onclick="toggleCleanTask(${c.id})"></div>
+      <div class="clean-text">${escHtml(c.text)}</div>
+      <button class="clean-delete" onclick="deleteCleanTask(${c.id})">×</button>
+    </div>`;
+  });
+  if (completed.length > 0) {
+    html += `<div style="font-size:12px;color:var(--text-secondary);font-weight:600;padding:12px 0 6px;text-transform:uppercase;">Done this week (${completed.length})</div>`;
+    completed.forEach(c => {
+      html += `<div class="clean-item">
+        <div class="clean-check checked" onclick="toggleCleanTask(${c.id})"></div>
+        <div class="clean-text done">${escHtml(c.text)}</div>
+        <button class="clean-delete" onclick="deleteCleanTask(${c.id})">×</button>
       </div>`;
     });
   }
