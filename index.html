@@ -5,23 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="My Organiser">
-<title>My Organiser</title>
+<meta name="apple-mobile-web-app-title" content="Samplanz">
+<title>Samplanz</title>
 <style>
   :root {
-    --bg: #f8f7f4;
-    --card: #ffffff;
-    --text: #1a1a1a;
-    --text-secondary: #6b6b6b;
-    --accent: #3b82f6;
-    --accent-light: #dbeafe;
-    --border: #e5e5e5;
-    --danger: #ef4444;
-    --success: #22c55e;
-    --success-light: #dcfce7;
-    --warning: #f59e0b;
-    --warning-light: #fef3c7;
-    --radius: 14px;
+    --bg: #0f0f1a;
+    --bg-secondary: #1a1a2e;
+    --card: #1e1e36;
+    --card-hover: #262645;
+    --text: #f0f0f5;
+    --text-secondary: #8888aa;
+    --accent: #7c3aed;
+    --accent-light: rgba(124,58,237,0.2);
+    --accent-glow: rgba(124,58,237,0.4);
+    --pink: #ec4899;
+    --pink-light: rgba(236,72,153,0.2);
+    --cyan: #06b6d4;
+    --cyan-light: rgba(6,182,212,0.2);
+    --orange: #f97316;
+    --orange-light: rgba(249,115,22,0.2);
+    --green: #10b981;
+    --green-light: rgba(16,185,129,0.2);
+    --red: #ef4444;
+    --red-light: rgba(239,68,68,0.2);
+    --yellow: #facc15;
+    --yellow-light: rgba(250,204,21,0.15);
+    --border: rgba(255,255,255,0.08);
+    --border-light: rgba(255,255,255,0.12);
+    --radius: 16px;
     --nav-height: 70px;
     --safe-top: env(safe-area-inset-top, 20px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -39,16 +50,24 @@
     padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 10px);
   }
 
-  /* Header */
+  /* Gradient header */
   .header {
-    padding: 16px 20px 8px;
+    padding: 16px 20px 12px;
     position: sticky;
     top: 0;
-    background: var(--bg);
+    background: linear-gradient(180deg, var(--bg) 60%, transparent);
     z-index: 50;
   }
-  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .header h1 {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   .header .date-subtitle { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Greeting */
+  .greeting { font-size: 16px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 400; }
 
   /* Tab content */
   .tab-content { display: none; padding: 8px 20px 20px; }
@@ -60,38 +79,82 @@
     border-radius: var(--radius);
     padding: 16px;
     margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     border: 1px solid var(--border);
   }
+
+  /* ===== SUMMARY CARDS ===== */
+  .summary-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .summary-card {
+    flex: 1; border-radius: 14px; padding: 14px 12px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .summary-card::before {
+    content: ''; position: absolute; inset: 0; opacity: 0.12; border-radius: 14px;
+  }
+  .summary-card.sc-tasks { background: var(--pink-light); border: 1px solid rgba(236,72,153,0.2); }
+  .summary-card.sc-tasks .num { color: var(--pink); }
+  .summary-card.sc-events { background: var(--cyan-light); border: 1px solid rgba(6,182,212,0.2); }
+  .summary-card.sc-events .num { color: var(--cyan); }
+  .summary-card.sc-habits { background: var(--green-light); border: 1px solid rgba(16,185,129,0.2); }
+  .summary-card.sc-habits .num { color: var(--green); }
+  .summary-card .num { font-size: 24px; font-weight: 800; }
+  .summary-card .label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; font-weight: 500; }
+
+  /* ===== TODAY'S AGENDA ===== */
+  .agenda-section { margin-bottom: 16px; }
+  .agenda-section h3 {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-secondary); margin-bottom: 10px; padding-left: 2px;
+  }
+  .agenda-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: var(--card); border-radius: 12px; margin-bottom: 8px;
+    border: 1px solid var(--border);
+  }
+  .agenda-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .agenda-icon.event { background: var(--cyan-light); }
+  .agenda-icon.task { background: var(--pink-light); }
+  .agenda-icon.habit { background: var(--green-light); }
+  .agenda-text { flex: 1; }
+  .agenda-text .title { font-size: 14px; font-weight: 500; }
+  .agenda-text .subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
 
   /* ===== CALENDAR ===== */
   .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .cal-nav button {
-    background: none; border: none; font-size: 20px; color: var(--accent);
-    padding: 8px 12px; cursor: pointer; border-radius: 8px;
+    background: var(--bg-secondary); border: 1px solid var(--border); font-size: 18px;
+    color: var(--accent); padding: 6px 12px; cursor: pointer; border-radius: 10px;
   }
   .cal-nav button:active { background: var(--accent-light); }
-  .cal-nav span { font-size: 17px; font-weight: 600; }
+  .cal-nav span { font-size: 17px; font-weight: 700; }
 
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
   .cal-grid .day-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; padding: 6px 0; }
   .cal-day {
     aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-size: 15px; border-radius: 50%; cursor: pointer; position: relative;
-    font-weight: 400;
+    font-size: 14px; border-radius: 50%; cursor: pointer; position: relative;
+    font-weight: 400; color: var(--text);
   }
   .cal-day:active { background: var(--accent-light); }
-  .cal-day.today { font-weight: 700; color: var(--accent); }
-  .cal-day.selected { background: var(--accent); color: #fff; font-weight: 600; }
-  .cal-day.other-month { color: #ccc; }
+  .cal-day.today { font-weight: 800; color: var(--cyan); }
+  .cal-day.selected {
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    color: #fff; font-weight: 700;
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
+  .cal-day.other-month { color: rgba(255,255,255,0.15); }
   .cal-day .dot {
-    position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-    width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
+    position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--pink);
   }
   .cal-day.selected .dot { background: #fff; }
 
-  .day-events { margin-top: 16px; }
-  .day-events h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+  .day-events { margin-top: 12px; }
+  .day-events h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
   .event-item {
     display: flex; align-items: center; gap: 10px; padding: 10px 0;
     border-bottom: 1px solid var(--border); font-size: 14px;
@@ -100,21 +163,62 @@
   .event-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .event-time { color: var(--text-secondary); font-size: 12px; min-width: 50px; }
   .event-title { flex: 1; }
-  .event-delete { background: none; border: none; color: var(--danger); font-size: 18px; cursor: pointer; padding: 4px; }
+  .event-delete { background: none; border: none; color: var(--red); font-size: 18px; cursor: pointer; padding: 4px; }
+
+  /* ===== WEEKLY PLANNER ===== */
+  .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .week-nav button {
+    background: var(--bg-secondary); border: 1px solid var(--border); font-size: 18px;
+    color: var(--accent); padding: 6px 12px; cursor: pointer; border-radius: 10px;
+  }
+  .week-nav span { font-size: 15px; font-weight: 700; }
+
+  .week-strip { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+  .week-strip::-webkit-scrollbar { display: none; }
+  .week-day-card {
+    flex: 1; min-width: 44px; text-align: center; padding: 10px 4px;
+    border-radius: 12px; cursor: pointer; background: var(--card);
+    border: 1px solid var(--border); transition: all 0.2s;
+  }
+  .week-day-card.today { border-color: var(--cyan); }
+  .week-day-card.selected {
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    border-color: transparent;
+    box-shadow: 0 2px 12px var(--accent-glow);
+  }
+  .week-day-card .wday { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
+  .week-day-card .wdate { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .week-day-card.selected .wday, .week-day-card.selected .wdate { color: #fff; }
+  .week-day-card .wdot { width: 5px; height: 5px; border-radius: 50%; background: var(--pink); margin: 4px auto 0; }
+  .week-day-card.selected .wdot { background: #fff; }
+
+  .week-timeline { position: relative; }
+  .time-slot {
+    display: flex; gap: 12px; min-height: 50px; padding: 6px 0;
+    border-top: 1px solid var(--border);
+  }
+  .time-label { font-size: 11px; color: var(--text-secondary); min-width: 40px; padding-top: 2px; }
+  .time-events { flex: 1; }
+  .time-event {
+    padding: 8px 12px; border-radius: 10px; margin-bottom: 4px;
+    font-size: 13px; font-weight: 500;
+  }
 
   /* ===== TASKS ===== */
   .task-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
   .task-input-row input {
-    flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-    font-size: 15px; background: var(--bg); outline: none; font-family: inherit;
+    flex: 1; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+    font-size: 15px; background: var(--bg-secondary); outline: none; font-family: inherit;
+    color: var(--text);
   }
-  .task-input-row input:focus { border-color: var(--accent); }
+  .task-input-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .task-input-row input::placeholder { color: var(--text-secondary); }
   .task-input-row button {
-    padding: 12px 18px; border-radius: 10px; border: none;
-    background: var(--accent); color: #fff; font-size: 15px; font-weight: 600;
-    cursor: pointer;
+    padding: 12px 20px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
   }
-  .task-input-row button:active { opacity: 0.8; }
+  .task-input-row button:active { opacity: 0.85; }
 
   .task-item {
     display: flex; align-items: center; gap: 12px; padding: 12px 0;
@@ -122,59 +226,68 @@
   }
   .task-item:last-child { border-bottom: none; }
   .task-checkbox {
-    width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border);
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border-light);
     display: flex; align-items: center; justify-content: center; cursor: pointer;
     flex-shrink: 0; transition: all 0.2s;
   }
-  .task-checkbox.checked { background: var(--success); border-color: var(--success); }
-  .task-checkbox.checked::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 700; }
+  .task-checkbox.checked {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    border-color: transparent;
+  }
+  .task-checkbox.checked::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 800; }
   .task-text { flex: 1; font-size: 15px; }
   .task-text.done { text-decoration: line-through; color: var(--text-secondary); }
   .task-delete { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 4px; }
-  .task-delete:hover { color: var(--danger); }
 
   .task-filters { display: flex; gap: 8px; margin-bottom: 12px; }
   .task-filter {
-    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border);
     background: var(--card); font-size: 13px; cursor: pointer; color: var(--text-secondary);
+    font-weight: 500;
   }
-  .task-filter.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .task-filter.active {
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    color: #fff; border-color: transparent;
+  }
 
   /* ===== NOTES ===== */
   .note-item {
-    padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+    padding: 14px; margin-bottom: 8px; cursor: pointer;
+    background: var(--card); border-radius: 12px; border: 1px solid var(--border);
   }
-  .note-item:last-child { border-bottom: none; }
+  .note-item:active { background: var(--card-hover); }
   .note-item h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
   .note-item p { font-size: 13px; color: var(--text-secondary); line-height: 1.4;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .note-item .note-date { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+  .note-item .note-date { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
 
   .note-editor { display: none; }
   .note-editor.active { display: block; }
   .note-editor input {
-    width: 100%; padding: 12px 0; border: none; font-size: 20px; font-weight: 600;
-    background: transparent; outline: none; font-family: inherit;
+    width: 100%; padding: 12px 0; border: none; font-size: 22px; font-weight: 700;
+    background: transparent; outline: none; font-family: inherit; color: var(--text);
   }
+  .note-editor input::placeholder { color: var(--text-secondary); }
   .note-editor textarea {
     width: 100%; min-height: 300px; padding: 12px 0; border: none;
     font-size: 15px; background: transparent; outline: none; resize: none;
-    font-family: inherit; line-height: 1.6;
+    font-family: inherit; line-height: 1.6; color: var(--text);
   }
+  .note-editor textarea::placeholder { color: var(--text-secondary); }
   .note-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .note-toolbar button {
-    padding: 8px 16px; border-radius: 8px; border: none; font-size: 14px;
-    cursor: pointer; font-weight: 500;
+    padding: 8px 16px; border-radius: 10px; border: none; font-size: 14px;
+    cursor: pointer; font-weight: 600;
   }
   .note-back { background: none; color: var(--accent); }
-  .note-save { background: var(--accent); color: #fff; }
-  .note-delete-btn { background: none; color: var(--danger); }
+  .note-save { background: linear-gradient(135deg, var(--accent), var(--pink)); color: #fff; }
+  .note-delete-btn { background: none; color: var(--red); }
 
   .add-note-btn {
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    width: 100%; padding: 14px; border-radius: var(--radius); border: 2px dashed var(--border);
+    width: 100%; padding: 14px; border-radius: var(--radius); border: 2px dashed var(--border-light);
     background: transparent; font-size: 15px; color: var(--text-secondary);
-    cursor: pointer; margin-top: 8px;
+    cursor: pointer; margin-top: 8px; font-weight: 500;
   }
 
   /* ===== HABITS ===== */
@@ -184,70 +297,83 @@
   }
   .habit-item:last-child { border-bottom: none; }
   .habit-check {
-    width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--border);
+    width: 30px; height: 30px; border-radius: 10px; border: 2px solid var(--border-light);
     display: flex; align-items: center; justify-content: center; cursor: pointer;
     flex-shrink: 0; transition: all 0.2s;
   }
-  .habit-check.checked { background: var(--success); border-color: var(--success); }
-  .habit-check.checked::after { content: '✓'; color: #fff; font-size: 15px; font-weight: 700; }
+  .habit-check.checked {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    border-color: transparent; box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+  }
+  .habit-check.checked::after { content: '✓'; color: #fff; font-size: 16px; font-weight: 800; }
   .habit-info { flex: 1; }
-  .habit-name { font-size: 15px; font-weight: 500; }
+  .habit-name { font-size: 15px; font-weight: 600; }
   .habit-streak { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-  .habit-streak span { color: var(--warning); font-weight: 600; }
+  .habit-streak span { color: var(--orange); font-weight: 700; }
   .habit-delete { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; }
 
-  .habit-week {
-    display: flex; gap: 4px; margin-top: 8px;
-  }
+  .habit-week { display: flex; gap: 5px; margin-top: 8px; }
   .habit-week-dot {
-    width: 20px; height: 20px; border-radius: 4px; font-size: 9px;
+    width: 22px; height: 22px; border-radius: 6px; font-size: 9px;
     display: flex; align-items: center; justify-content: center;
-    color: var(--text-secondary); background: var(--bg);
+    color: var(--text-secondary); background: var(--bg-secondary);
+    font-weight: 600;
   }
-  .habit-week-dot.done { background: var(--success-light); color: var(--success); }
-  .habit-week-dot.today { border: 1.5px solid var(--accent); }
+  .habit-week-dot.done { background: var(--green-light); color: var(--green); }
+  .habit-week-dot.today { border: 2px solid var(--accent); }
 
-  /* Add event / habit modal */
+  /* ===== MODALS ===== */
   .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     z-index: 100; align-items: flex-end; justify-content: center;
+    backdrop-filter: blur(4px);
   }
   .modal-overlay.active { display: flex; }
   .modal {
-    background: var(--card); border-radius: 20px 20px 0 0; width: 100%;
-    max-width: 500px; padding: 24px 20px calc(24px + var(--safe-bottom));
-    animation: slideUp 0.3s ease;
+    background: var(--card); border-radius: 24px 24px 0 0; width: 100%;
+    max-width: 500px; padding: 28px 20px calc(24px + var(--safe-bottom));
+    animation: slideUp 0.3s ease; border-top: 1px solid var(--border-light);
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .modal h3 { font-size: 20px; font-weight: 700; margin-bottom: 18px; }
+  .modal label { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
   .modal input, .modal select {
-    width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-    font-size: 15px; margin-bottom: 12px; font-family: inherit; background: var(--bg);
-    outline: none;
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border);
+    font-size: 15px; margin-bottom: 14px; font-family: inherit; background: var(--bg-secondary);
+    outline: none; color: var(--text);
   }
-  .modal input:focus, .modal select:focus { border-color: var(--accent); }
+  .modal input::placeholder { color: var(--text-secondary); }
+  .modal input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .color-options { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .color-opt {
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    border: 3px solid transparent; transition: all 0.2s;
+  }
+  .color-opt.selected { border-color: #fff; transform: scale(1.15); }
   .modal-actions { display: flex; gap: 10px; margin-top: 8px; }
   .modal-actions button {
-    flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 15px;
-    font-weight: 600; cursor: pointer;
+    flex: 1; padding: 14px; border-radius: 14px; border: none; font-size: 15px;
+    font-weight: 700; cursor: pointer;
   }
-  .modal-cancel { background: var(--bg); color: var(--text); }
-  .modal-save { background: var(--accent); color: #fff; }
+  .modal-cancel { background: var(--bg-secondary); color: var(--text); }
+  .modal-save { background: linear-gradient(135deg, var(--accent), var(--pink)); color: #fff; }
+  .modal-save:active { opacity: 0.85; }
 
   /* FAB */
   .fab {
     position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
-    right: 20px; width: 52px; height: 52px; border-radius: 50%;
-    background: var(--accent); color: #fff; border: none; font-size: 28px;
+    right: 20px; width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    color: #fff; border: none; font-size: 28px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(59,130,246,0.4); cursor: pointer; z-index: 40;
+    box-shadow: 0 4px 20px var(--accent-glow); cursor: pointer; z-index: 40;
   }
-  .fab:active { transform: scale(0.95); }
+  .fab:active { transform: scale(0.92); }
 
   /* Bottom nav */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.92); backdrop-filter: blur(20px);
+    background: rgba(15,15,26,0.92); backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
     display: flex; justify-content: space-around; align-items: center;
     height: calc(var(--nav-height) + var(--safe-bottom));
@@ -256,52 +382,132 @@
   }
   .nav-item {
     display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 8px 16px; cursor: pointer; background: none; border: none;
-    color: var(--text-secondary); font-size: 10px; font-weight: 500;
+    padding: 8px 12px; cursor: pointer; background: none; border: none;
+    color: var(--text-secondary); font-size: 10px; font-weight: 600;
   }
   .nav-item.active { color: var(--accent); }
   .nav-item svg { width: 24px; height: 24px; }
 
   /* Empty state */
-  .empty-state {
-    text-align: center; padding: 40px 20px; color: var(--text-secondary);
-  }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
   .empty-state .emoji { font-size: 40px; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; line-height: 1.5; }
 
-  /* Summary cards on calendar */
-  .summary-row { display: flex; gap: 10px; margin-bottom: 16px; }
-  .summary-card {
-    flex: 1; background: var(--card); border-radius: 12px; padding: 12px;
-    text-align: center; border: 1px solid var(--border);
+  /* ===== VOICE / MIC ===== */
+  .mic-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--bg-secondary); color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all 0.2s;
   }
-  .summary-card .num { font-size: 22px; font-weight: 700; }
-  .summary-card .label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+  .mic-btn:active { background: var(--accent-light); }
+  .mic-btn.listening {
+    background: var(--red-light); border-color: var(--red);
+    color: var(--red); animation: pulse 1.2s ease-in-out infinite;
+  }
+  .mic-btn svg { width: 20px; height: 20px; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+  }
+
+  .voice-fab {
+    position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
+    left: 20px; width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--cyan), var(--green));
+    color: #fff; border: none; font-size: 22px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(6,182,212,0.4); cursor: pointer; z-index: 40;
+  }
+  .voice-fab:active { transform: scale(0.92); }
+  .voice-fab.listening {
+    background: linear-gradient(135deg, var(--red), var(--orange));
+    box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .voice-fab svg { width: 24px; height: 24px; }
+
+  /* Voice command overlay */
+  .voice-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 200; align-items: center; justify-content: center;
+    flex-direction: column; backdrop-filter: blur(8px);
+  }
+  .voice-overlay.active { display: flex; }
+  .voice-overlay .voice-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    display: flex; align-items: center; justify-content: center;
+    animation: pulse-big 1.5s ease-in-out infinite;
+  }
+  .voice-overlay .voice-circle svg { width: 48px; height: 48px; color: #fff; }
+  @keyframes pulse-big {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.5); transform: scale(1); }
+    50% { box-shadow: 0 0 0 20px rgba(124,58,237,0); transform: scale(1.05); }
+  }
+  .voice-overlay .voice-text {
+    margin-top: 24px; font-size: 18px; font-weight: 600;
+    color: var(--text); text-align: center; max-width: 280px;
+  }
+  .voice-overlay .voice-hint {
+    margin-top: 8px; font-size: 13px; color: var(--text-secondary);
+    text-align: center; max-width: 280px; line-height: 1.4;
+  }
+  .voice-overlay .voice-cancel {
+    margin-top: 32px; padding: 12px 32px; border-radius: 12px;
+    border: 1px solid var(--border-light); background: transparent;
+    color: var(--text); font-size: 15px; cursor: pointer; font-weight: 500;
+  }
+
+  .mic-inline { display: inline-flex; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1 id="headerTitle">My Organiser</h1>
+  <div class="greeting" id="greeting"></div>
+  <h1 id="headerTitle">Samplanz</h1>
   <div class="date-subtitle" id="headerDate"></div>
 </div>
 
-<!-- CALENDAR TAB -->
-<div class="tab-content active" id="tab-calendar">
+<!-- TODAY TAB -->
+<div class="tab-content active" id="tab-today">
   <div class="summary-row">
-    <div class="summary-card">
+    <div class="summary-card sc-tasks">
       <div class="num" id="sumTasks">0</div>
-      <div class="label">Tasks today</div>
+      <div class="label">Tasks</div>
     </div>
-    <div class="summary-card">
+    <div class="summary-card sc-events">
       <div class="num" id="sumEvents">0</div>
       <div class="label">Events</div>
     </div>
-    <div class="summary-card">
+    <div class="summary-card sc-habits">
       <div class="num" id="sumHabits">0</div>
-      <div class="label">Habits done</div>
+      <div class="label">Habits</div>
     </div>
   </div>
+  <div id="todayAgenda"></div>
+</div>
+
+<!-- WEEK TAB -->
+<div class="tab-content" id="tab-week">
+  <div class="card">
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">‹</button>
+      <span id="weekLabel"></span>
+      <button onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="week-strip" id="weekStrip"></div>
+  </div>
+  <div class="card">
+    <h3 id="weekDayTitle" style="font-size:15px;font-weight:700;margin-bottom:12px;"></h3>
+    <div id="weekDayEvents"></div>
+    <div id="weekTimeline"></div>
+  </div>
+</div>
+
+<!-- CALENDAR TAB -->
+<div class="tab-content" id="tab-calendar">
   <div class="card">
     <div class="cal-nav">
       <button onclick="changeMonth(-1)">‹</button>
@@ -319,13 +525,14 @@
 <!-- TASKS TAB -->
 <div class="tab-content" id="tab-tasks">
   <div class="task-input-row">
-    <input type="text" id="taskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
+    <input type="text" id="taskInput" placeholder="What needs doing?" onkeydown="if(event.key==='Enter')addTask()">
+    <button class="mic-btn" id="taskMic" onclick="startFieldVoice('taskInput', 'taskMic')" title="Dictate task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
     <button onclick="addTask()">Add</button>
   </div>
   <div class="task-filters">
-    <button class="task-filter active" onclick="setTaskFilter('all')">All</button>
-    <button class="task-filter" onclick="setTaskFilter('active')">Active</button>
-    <button class="task-filter" onclick="setTaskFilter('done')">Done</button>
+    <button class="task-filter active" onclick="setTaskFilter('all', this)">All</button>
+    <button class="task-filter" onclick="setTaskFilter('active', this)">Active</button>
+    <button class="task-filter" onclick="setTaskFilter('done', this)">Done</button>
   </div>
   <div class="card" id="taskList"></div>
 </div>
@@ -341,8 +548,14 @@
         <button class="note-save" onclick="saveCurrentNote()">Save</button>
       </div>
     </div>
-    <input type="text" id="noteTitle" placeholder="Title">
-    <textarea id="noteBody" placeholder="Start writing..."></textarea>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="noteTitle" placeholder="Title" style="flex:1;">
+      <button class="mic-btn" id="noteTitleMic" onclick="startFieldVoice('noteTitle', 'noteTitleMic')" title="Dictate title" style="width:38px;height:38px;border-radius:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+    </div>
+    <div style="position:relative;">
+      <textarea id="noteBody" placeholder="Start writing..."></textarea>
+      <button class="mic-btn" id="noteBodyMic" onclick="startFieldVoice('noteBody', 'noteBodyMic', true)" title="Dictate note" style="position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+    </div>
   </div>
   <button class="add-note-btn" id="addNoteBtn" onclick="openNewNote()">+ New Note</button>
 </div>
@@ -352,21 +565,44 @@
   <div class="card" id="habitList"></div>
 </div>
 
+<!-- Voice command FAB -->
+<button class="voice-fab" id="voiceFab" onclick="startVoiceCommand()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+</button>
+
+<!-- Voice overlay -->
+<div class="voice-overlay" id="voiceOverlay">
+  <div class="voice-circle">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </div>
+  <div class="voice-text" id="voiceText">Listening...</div>
+  <div class="voice-hint" id="voiceHint">Say something like:<br>"Add task buy groceries"<br>"Add event dentist at 3pm"<br>"Add habit drink water"</div>
+  <button class="voice-cancel" onclick="cancelVoiceCommand()">Cancel</button>
+</div>
+
 <!-- FAB -->
 <button class="fab" id="fabBtn" onclick="openModal()">+</button>
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
-  <button class="nav-item active" onclick="switchTab('calendar')" id="nav-calendar">
+  <button class="nav-item active" onclick="switchTab('today')" id="nav-today">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Today
+  </button>
+  <button class="nav-item" onclick="switchTab('week')" id="nav-week">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="4" x2="9" y2="22"/></svg>
+    Week
+  </button>
+  <button class="nav-item" onclick="switchTab('calendar')" id="nav-calendar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Calendar
+    Month
   </button>
   <button class="nav-item" onclick="switchTab('tasks')" id="nav-tasks">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
     Tasks
   </button>
   <button class="nav-item" onclick="switchTab('notes')" id="nav-notes">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     Notes
   </button>
   <button class="nav-item" onclick="switchTab('habits')" id="nav-habits">
@@ -378,13 +614,19 @@
 <!-- Modal: Add Event -->
 <div class="modal-overlay" id="eventModal">
   <div class="modal">
-    <h3 id="modalTitle">Add Event</h3>
-    <input type="text" id="eventName" placeholder="Event name">
+    <h3>New Event</h3>
+    <label>Event name</label>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="text" id="eventName" placeholder="e.g. Team standup" style="margin-bottom:0;">
+      <button class="mic-btn" id="eventMic" onclick="startFieldVoice('eventName', 'eventMic')" title="Dictate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+    </div>
+    <label>Time</label>
     <input type="time" id="eventTime">
-    <input type="text" id="eventColor" placeholder="Color (e.g. #3b82f6)" value="#3b82f6">
+    <label>Colour</label>
+    <div class="color-options" id="colorOptions"></div>
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-save" onclick="saveEvent()">Save</button>
+      <button class="modal-save" onclick="saveEvent()">Add Event</button>
     </div>
   </div>
 </div>
@@ -393,54 +635,95 @@
 <div class="modal-overlay" id="habitModal">
   <div class="modal">
     <h3>New Habit</h3>
-    <input type="text" id="habitName" placeholder="Habit name (e.g. Exercise)">
+    <label>Habit name</label>
+    <input type="text" id="habitName" placeholder="e.g. Exercise, Read, Meditate">
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeHabitModal()">Cancel</button>
-      <button class="modal-save" onclick="saveHabit()">Save</button>
+      <button class="modal-save" onclick="saveHabit()">Add Habit</button>
     </div>
   </div>
 </div>
 
 <script>
-// ===== DATA STORE =====
-const STORAGE_KEY = 'myOrganiserData';
+// ===== DATA =====
+const STORAGE_KEY = 'samplanzData';
 let data = loadData();
-
 function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
   return { events: {}, tasks: [], notes: [], habits: [] };
 }
-
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
 // ===== STATE =====
-let currentTab = 'calendar';
+let currentTab = 'today';
 let calYear, calMonth, selectedDate;
+let weekStart;
+let weekSelectedDate;
 let taskFilter = 'all';
 let editingNoteId = null;
+let selectedColor = '#7c3aed';
 
-// ===== INIT =====
 const today = new Date();
 calYear = today.getFullYear();
 calMonth = today.getMonth();
 selectedDate = dateKey(today);
 
+// Week state
+weekStart = getMonday(today);
+weekSelectedDate = dateKey(today);
+
 function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-
+function getMonday(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = dt.getDate() - day + (day === 0 ? -6 : 1);
+  dt.setDate(diff);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
 function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+function formatShortDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
+// ===== COLORS =====
+const eventColors = ['#7c3aed','#ec4899','#06b6d4','#10b981','#f97316','#facc15','#ef4444','#8b5cf6'];
+
+function renderColorOptions() {
+  const container = document.getElementById('colorOptions');
+  container.innerHTML = eventColors.map(c =>
+    `<div class="color-opt ${c===selectedColor?'selected':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`
+  ).join('');
+}
+function pickColor(c) { selectedColor = c; renderColorOptions(); }
+
+// ===== GREETING =====
+function getGreeting() {
+  const h = today.getHours();
+  if (h < 12) return 'Good morning, Sam';
+  if (h < 17) return 'Good afternoon, Sam';
+  return 'Good evening, Sam';
+}
+
+// ===== INIT =====
 function init() {
+  document.getElementById('greeting').textContent = getGreeting();
   document.getElementById('headerDate').textContent = today.toLocaleDateString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long'
   });
+  renderColorOptions();
+  renderAll();
+}
+
+function renderAll() {
+  renderTodayAgenda();
+  renderWeek();
   renderCalendar();
   renderTasks();
   renderNotes();
@@ -457,28 +740,149 @@ function switchTab(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
 
   const fab = document.getElementById('fabBtn');
-  if (tab === 'calendar' || tab === 'habits') {
-    fab.style.display = 'flex';
-  } else if (tab === 'tasks') {
-    fab.style.display = 'none';
-  } else {
-    fab.style.display = 'none';
-  }
+  fab.style.display = (tab === 'today' || tab === 'calendar' || tab === 'week' || tab === 'habits') ? 'flex' : 'none';
 
-  // Update header
-  const titles = { calendar: 'My Organiser', tasks: 'Tasks', notes: 'Notes', habits: 'Habits' };
+  const titles = { today: 'Samplanz', week: 'Weekly Planner', calendar: 'Calendar', tasks: 'Tasks', notes: 'Notes', habits: 'Habits' };
   document.getElementById('headerTitle').textContent = titles[tab];
+  document.getElementById('greeting').style.display = tab === 'today' ? 'block' : 'none';
 }
 
 // ===== FAB =====
 function openModal() {
-  if (currentTab === 'calendar') {
-    document.getElementById('eventModal').classList.add('active');
-    document.getElementById('eventName').focus();
-  } else if (currentTab === 'habits') {
+  if (currentTab === 'habits') {
     document.getElementById('habitModal').classList.add('active');
     document.getElementById('habitName').focus();
+  } else {
+    document.getElementById('eventModal').classList.add('active');
+    document.getElementById('eventName').focus();
+    renderColorOptions();
   }
+}
+
+// ===== TODAY AGENDA =====
+function renderTodayAgenda() {
+  const container = document.getElementById('todayAgenda');
+  const todayKey = dateKey(today);
+  const events = (data.events[todayKey] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const tasks = data.tasks.filter(t => !t.done);
+  const habits = data.habits;
+  const todayHabitsDone = habits.filter(h => h.completions && h.completions.includes(todayKey));
+  const todayHabitsLeft = habits.filter(h => !h.completions || !h.completions.includes(todayKey));
+
+  let html = '';
+
+  if (events.length > 0) {
+    html += '<div class="agenda-section"><h3>Events</h3>';
+    events.forEach(e => {
+      html += `<div class="agenda-item">
+        <div class="agenda-icon event" style="background:${e.color || 'var(--cyan-light)'}22;">
+          <div style="width:10px;height:10px;border-radius:50%;background:${e.color || 'var(--cyan)'}"></div>
+        </div>
+        <div class="agenda-text"><div class="title">${escHtml(e.name)}</div><div class="subtitle">${e.time || 'All day'}</div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (tasks.length > 0) {
+    html += '<div class="agenda-section"><h3>Active Tasks</h3>';
+    tasks.slice(0, 5).forEach(t => {
+      html += `<div class="agenda-item" onclick="toggleTask(${t.id}); renderAll();">
+        <div class="agenda-icon task"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--pink)"></div></div>
+        <div class="agenda-text"><div class="title">${escHtml(t.text)}</div></div>
+      </div>`;
+    });
+    if (tasks.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${tasks.length - 5} more tasks</div>`;
+    html += '</div>';
+  }
+
+  if (todayHabitsLeft.length > 0) {
+    html += '<div class="agenda-section"><h3>Habits remaining</h3>';
+    todayHabitsLeft.forEach(h => {
+      html += `<div class="agenda-item" onclick="toggleHabit(${h.id}); renderAll();">
+        <div class="agenda-icon habit"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--green)"></div></div>
+        <div class="agenda-text"><div class="title">${escHtml(h.name)}</div><div class="subtitle">Tap to complete</div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (!events.length && !tasks.length && !habits.length) {
+    html = '<div class="empty-state"><div class="emoji">✨</div><p>Your day is clear! Add some events, tasks, or habits to get started.</p></div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ===== WEEKLY PLANNER =====
+function changeWeek(delta) {
+  weekStart = new Date(weekStart);
+  weekStart.setDate(weekStart.getDate() + (delta * 7));
+  weekSelectedDate = dateKey(weekStart);
+  renderWeek();
+}
+
+function renderWeek() {
+  // Label
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const fmt = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  document.getElementById('weekLabel').textContent = `${fmt(weekStart)} — ${fmt(weekEnd)}`;
+
+  // Strip
+  const strip = document.getElementById('weekStrip');
+  const todayKey = dateKey(today);
+  let stripHtml = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + i);
+    const key = dateKey(d);
+    const isToday = key === todayKey;
+    const isSelected = key === weekSelectedDate;
+    const hasEvents = data.events[key] && data.events[key].length > 0;
+    stripHtml += `<div class="week-day-card ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" onclick="selectWeekDay('${key}')">
+      <div class="wday">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</div>
+      <div class="wdate">${d.getDate()}</div>
+      ${hasEvents ? '<div class="wdot"></div>' : ''}
+    </div>`;
+  }
+  strip.innerHTML = stripHtml;
+
+  // Day detail
+  document.getElementById('weekDayTitle').textContent = formatDate(weekSelectedDate);
+  const events = (data.events[weekSelectedDate] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const evList = document.getElementById('weekDayEvents');
+
+  if (events.length === 0) {
+    evList.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p>No events for this day</p></div>';
+  } else {
+    evList.innerHTML = events.map((e, i) => `
+      <div class="event-item">
+        <div class="event-dot" style="background:${e.color || '#7c3aed'}"></div>
+        <div class="event-time">${e.time || 'All day'}</div>
+        <div class="event-title">${escHtml(e.name)}</div>
+        <button class="event-delete" onclick="deleteEvent('${weekSelectedDate}',${i}); renderAll();">×</button>
+      </div>
+    `).join('');
+  }
+
+  // Tasks for that day
+  const dayTasks = data.tasks.filter(t => t.date === weekSelectedDate);
+  const timeline = document.getElementById('weekTimeline');
+  if (dayTasks.length > 0) {
+    timeline.innerHTML = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:12px;color:var(--text-secondary);font-weight:600;margin-bottom:8px;text-transform:uppercase">Tasks</div>' +
+      dayTasks.map(t => `<div class="event-item">
+        <div class="task-checkbox ${t.done?'checked':''}" onclick="toggleTask(${t.id}); renderAll();" style="width:18px;height:18px;"></div>
+        <div class="event-title ${t.done?'task-text done':''}">${escHtml(t.text)}</div>
+      </div>`).join('') + '</div>';
+  } else {
+    timeline.innerHTML = '';
+  }
+}
+
+function selectWeekDay(key) {
+  weekSelectedDate = key;
+  renderWeek();
 }
 
 // ===== CALENDAR =====
@@ -495,33 +899,24 @@ function renderCalendar() {
 
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
-
-  const dayLabels = ['Mo','Tu','We','Th','Fr','Sa','Su'];
-  dayLabels.forEach(d => {
+  ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(d => {
     const el = document.createElement('div');
-    el.className = 'day-label';
-    el.textContent = d;
+    el.className = 'day-label'; el.textContent = d;
     grid.appendChild(el);
   });
 
   const firstDay = new Date(calYear, calMonth, 1);
   let startDay = firstDay.getDay() - 1;
   if (startDay < 0) startDay = 6;
-
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
-
   const todayKey = dateKey(today);
 
-  // Previous month days
   for (let i = startDay - 1; i >= 0; i--) {
     const el = document.createElement('div');
-    el.className = 'cal-day other-month';
-    el.textContent = daysInPrevMonth - i;
+    el.className = 'cal-day other-month'; el.textContent = daysInPrevMonth - i;
     grid.appendChild(el);
   }
-
-  // Current month days
   for (let d = 1; d <= daysInMonth; d++) {
     const el = document.createElement('div');
     const key = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -529,74 +924,53 @@ function renderCalendar() {
     if (key === todayKey) el.classList.add('today');
     if (key === selectedDate) el.classList.add('selected');
     el.textContent = d;
-
     if (data.events[key] && data.events[key].length > 0) {
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      el.appendChild(dot);
+      const dot = document.createElement('div'); dot.className = 'dot'; el.appendChild(dot);
     }
-
     el.onclick = () => { selectedDate = key; renderCalendar(); renderDayEvents(); updateSummary(); };
     grid.appendChild(el);
   }
-
-  // Next month days
   const totalCells = startDay + daysInMonth;
   const remaining = (7 - (totalCells % 7)) % 7;
   for (let i = 1; i <= remaining; i++) {
     const el = document.createElement('div');
-    el.className = 'cal-day other-month';
-    el.textContent = i;
+    el.className = 'cal-day other-month'; el.textContent = i;
     grid.appendChild(el);
   }
-
   renderDayEvents();
 }
 
 function renderDayEvents() {
   const events = data.events[selectedDate] || [];
-  const title = document.getElementById('dayEventsTitle');
+  document.getElementById('dayEventsTitle').textContent = formatDate(selectedDate);
   const list = document.getElementById('dayEventsList');
-
-  title.textContent = formatDate(selectedDate);
-
   if (events.length === 0) {
-    list.innerHTML = '<div class="empty-state"><p>No events for this day</p></div>';
+    list.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p>No events for this day</p></div>';
     return;
   }
-
   list.innerHTML = events.sort((a,b) => (a.time||'').localeCompare(b.time||''))
-    .map((e, i) => `
-      <div class="event-item">
-        <div class="event-dot" style="background:${e.color || '#3b82f6'}"></div>
-        <div class="event-time">${e.time || ''}</div>
-        <div class="event-title">${escHtml(e.name)}</div>
-        <button class="event-delete" onclick="deleteEvent('${selectedDate}',${i})">×</button>
-      </div>
-    `).join('');
+    .map((e, i) => `<div class="event-item">
+      <div class="event-dot" style="background:${e.color || '#7c3aed'}"></div>
+      <div class="event-time">${e.time || 'All day'}</div>
+      <div class="event-title">${escHtml(e.name)}</div>
+      <button class="event-delete" onclick="deleteEvent('${selectedDate}',${i}); renderAll();">×</button>
+    </div>`).join('');
 }
 
 function saveEvent() {
   const name = document.getElementById('eventName').value.trim();
   if (!name) return;
   const time = document.getElementById('eventTime').value;
-  const color = document.getElementById('eventColor').value || '#3b82f6';
-  if (!data.events[selectedDate]) data.events[selectedDate] = [];
-  data.events[selectedDate].push({ name, time, color });
-  save();
-  closeModal();
-  renderCalendar();
-  updateSummary();
+  const targetDate = (currentTab === 'week') ? weekSelectedDate : selectedDate;
+  if (!data.events[targetDate]) data.events[targetDate] = [];
+  data.events[targetDate].push({ name, time, color: selectedColor });
+  save(); closeModal(); renderAll();
 }
-
 function deleteEvent(date, idx) {
   data.events[date].splice(idx, 1);
   if (data.events[date].length === 0) delete data.events[date];
-  save();
-  renderCalendar();
-  updateSummary();
+  save(); renderAll();
 }
-
 function closeModal() {
   document.getElementById('eventModal').classList.remove('active');
   document.getElementById('eventName').value = '';
@@ -609,28 +983,18 @@ function addTask() {
   const text = input.value.trim();
   if (!text) return;
   data.tasks.unshift({ id: Date.now(), text, done: false, date: dateKey(today) });
-  save();
-  input.value = '';
-  renderTasks();
-  updateSummary();
+  save(); input.value = ''; renderAll();
 }
-
 function toggleTask(id) {
   const task = data.tasks.find(t => t.id === id);
-  if (task) { task.done = !task.done; save(); renderTasks(); updateSummary(); }
+  if (task) { task.done = !task.done; save(); }
 }
+function deleteTask(id) { data.tasks = data.tasks.filter(t => t.id !== id); save(); renderAll(); }
 
-function deleteTask(id) {
-  data.tasks = data.tasks.filter(t => t.id !== id);
-  save();
-  renderTasks();
-  updateSummary();
-}
-
-function setTaskFilter(f) {
+function setTaskFilter(f, btn) {
   taskFilter = f;
   document.querySelectorAll('.task-filter').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  btn.classList.add('active');
   renderTasks();
 }
 
@@ -638,20 +1002,17 @@ function renderTasks() {
   let tasks = data.tasks;
   if (taskFilter === 'active') tasks = tasks.filter(t => !t.done);
   if (taskFilter === 'done') tasks = tasks.filter(t => t.done);
-
   const list = document.getElementById('taskList');
   if (tasks.length === 0) {
     list.innerHTML = '<div class="empty-state"><div class="emoji">✅</div><p>No tasks yet. Add one above!</p></div>';
     return;
   }
-
   list.innerHTML = tasks.map(t => `
     <div class="task-item">
-      <div class="task-checkbox ${t.done ? 'checked' : ''}" onclick="toggleTask(${t.id})"></div>
+      <div class="task-checkbox ${t.done ? 'checked' : ''}" onclick="toggleTask(${t.id}); renderAll();"></div>
       <div class="task-text ${t.done ? 'done' : ''}">${escHtml(t.text)}</div>
       <button class="task-delete" onclick="deleteTask(${t.id})">×</button>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 // ===== NOTES =====
@@ -666,10 +1027,8 @@ function renderNotes() {
       <h4>${escHtml(n.title || 'Untitled')}</h4>
       <p>${escHtml(n.body || '').substring(0, 100)}</p>
       <div class="note-date">${new Date(n.updated).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
-
 function openNewNote() {
   editingNoteId = null;
   document.getElementById('noteTitle').value = '';
@@ -679,7 +1038,6 @@ function openNewNote() {
   document.getElementById('noteEditor').classList.add('active');
   document.getElementById('noteTitle').focus();
 }
-
 function openNote(id) {
   const note = data.notes.find(n => n.id === id);
   if (!note) return;
@@ -690,35 +1048,26 @@ function openNote(id) {
   document.getElementById('addNoteBtn').style.display = 'none';
   document.getElementById('noteEditor').classList.add('active');
 }
-
 function closeNoteEditor() {
   document.getElementById('noteEditor').classList.remove('active');
   document.getElementById('notesList').style.display = 'block';
   document.getElementById('addNoteBtn').style.display = 'flex';
-  editingNoteId = null;
-  renderNotes();
+  editingNoteId = null; renderNotes();
 }
-
 function saveCurrentNote() {
   const title = document.getElementById('noteTitle').value.trim();
   const body = document.getElementById('noteBody').value.trim();
   if (!title && !body) return;
-
   if (editingNoteId !== null) {
     const note = data.notes.find(n => n.id === editingNoteId);
     if (note) { note.title = title; note.body = body; note.updated = Date.now(); }
   } else {
     data.notes.push({ id: Date.now(), title, body, updated: Date.now() });
   }
-  save();
-  closeNoteEditor();
+  save(); closeNoteEditor();
 }
-
 function deleteCurrentNote() {
-  if (editingNoteId !== null) {
-    data.notes = data.notes.filter(n => n.id !== editingNoteId);
-    save();
-  }
+  if (editingNoteId !== null) { data.notes = data.notes.filter(n => n.id !== editingNoteId); save(); }
   closeNoteEditor();
 }
 
@@ -729,35 +1078,28 @@ function renderHabits() {
     list.innerHTML = '<div class="empty-state"><div class="emoji">📊</div><p>Add a habit to start tracking!</p></div>';
     return;
   }
-
   const todayKey = dateKey(today);
   const weekDays = [];
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
+    const d = new Date(today); d.setDate(d.getDate() - i);
     weekDays.push({ key: dateKey(d), label: d.toLocaleDateString('en-GB', { weekday: 'short' }).charAt(0) });
   }
-
   list.innerHTML = data.habits.map(h => {
     const isDone = h.completions && h.completions.includes(todayKey);
     const streak = calcStreak(h);
     const weekHtml = weekDays.map(wd => {
       const done = h.completions && h.completions.includes(wd.key);
-      const isToday = wd.key === todayKey;
-      return `<div class="habit-week-dot ${done ? 'done' : ''} ${isToday ? 'today' : ''}">${wd.label}</div>`;
+      return `<div class="habit-week-dot ${done ? 'done' : ''} ${wd.key === todayKey ? 'today' : ''}">${wd.label}</div>`;
     }).join('');
-
-    return `
-      <div class="habit-item">
-        <div class="habit-check ${isDone ? 'checked' : ''}" onclick="toggleHabit(${h.id})"></div>
-        <div class="habit-info">
-          <div class="habit-name">${escHtml(h.name)}</div>
-          <div class="habit-streak">${streak > 0 ? `<span>🔥 ${streak} day${streak > 1 ? 's' : ''}</span>` : 'No streak yet'}</div>
-          <div class="habit-week">${weekHtml}</div>
-        </div>
-        <button class="habit-delete" onclick="deleteHabit(${h.id})">×</button>
+    return `<div class="habit-item">
+      <div class="habit-check ${isDone ? 'checked' : ''}" onclick="toggleHabit(${h.id}); renderAll();"></div>
+      <div class="habit-info">
+        <div class="habit-name">${escHtml(h.name)}</div>
+        <div class="habit-streak">${streak > 0 ? `<span>🔥 ${streak} day${streak > 1 ? 's' : ''}</span>` : 'No streak yet'}</div>
+        <div class="habit-week">${weekHtml}</div>
       </div>
-    `;
+      <button class="habit-delete" onclick="deleteHabit(${h.id})">×</button>
+    </div>`;
   }).join('');
 }
 
@@ -768,11 +1110,7 @@ function calcStreak(habit) {
   const d = new Date(today);
   for (let i = 0; i < 365; i++) {
     const key = dateKey(d);
-    if (sorted.includes(key)) {
-      streak++;
-    } else if (i > 0) {
-      break;
-    }
+    if (sorted.includes(key)) { streak++; } else if (i > 0) { break; }
     d.setDate(d.getDate() - 1);
   }
   return streak;
@@ -787,26 +1125,15 @@ function toggleHabit(id) {
   if (idx >= 0) habit.completions.splice(idx, 1);
   else habit.completions.push(todayKey);
   save();
-  renderHabits();
-  updateSummary();
 }
 
 function saveHabit() {
   const name = document.getElementById('habitName').value.trim();
   if (!name) return;
   data.habits.push({ id: Date.now(), name, completions: [] });
-  save();
-  closeHabitModal();
-  renderHabits();
+  save(); closeHabitModal(); renderAll();
 }
-
-function deleteHabit(id) {
-  data.habits = data.habits.filter(h => h.id !== id);
-  save();
-  renderHabits();
-  updateSummary();
-}
-
+function deleteHabit(id) { data.habits = data.habits.filter(h => h.id !== id); save(); renderAll(); }
 function closeHabitModal() {
   document.getElementById('habitModal').classList.remove('active');
   document.getElementById('habitName').value = '';
@@ -815,31 +1142,224 @@ function closeHabitModal() {
 // ===== SUMMARY =====
 function updateSummary() {
   const todayKey = dateKey(today);
-  const todayTasks = data.tasks.filter(t => !t.done).length;
-  const todayEvents = (data.events[selectedDate] || []).length;
-  const todayHabits = data.habits.filter(h => h.completions && h.completions.includes(todayKey)).length;
-
-  document.getElementById('sumTasks').textContent = todayTasks;
-  document.getElementById('sumEvents').textContent = todayEvents;
-  document.getElementById('sumHabits').textContent = `${todayHabits}/${data.habits.length}`;
+  document.getElementById('sumTasks').textContent = data.tasks.filter(t => !t.done).length;
+  document.getElementById('sumEvents').textContent = (data.events[todayKey] || []).length;
+  const hDone = data.habits.filter(h => h.completions && h.completions.includes(todayKey)).length;
+  document.getElementById('sumHabits').textContent = `${hDone}/${data.habits.length}`;
 }
 
 // ===== UTILS =====
-function escHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// Close modals on backdrop
+document.getElementById('eventModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.getElementById('habitModal').addEventListener('click', function(e) { if (e.target === this) closeHabitModal(); });
+
+// ===== SPEECH RECOGNITION =====
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let speechSupported = !!SpeechRecognition;
+let activeRecognition = null;
+
+// Hide voice buttons if not supported
+if (!speechSupported) {
+  document.getElementById('voiceFab').style.display = 'none';
+  document.querySelectorAll('.mic-btn').forEach(b => b.style.display = 'none');
 }
 
-// Close modals on backdrop click
-document.getElementById('eventModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-document.getElementById('habitModal').addEventListener('click', function(e) {
-  if (e.target === this) closeHabitModal();
-});
+// Field-level voice input (for task input, event name, note title/body)
+function startFieldVoice(fieldId, btnId, append) {
+  if (!speechSupported) { alert('Speech recognition is not supported in this browser. Please use Safari.'); return; }
+  if (activeRecognition) { activeRecognition.stop(); return; }
 
-// Init
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-GB';
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = !!append;
+
+  const btn = document.getElementById(btnId);
+  const field = document.getElementById(fieldId);
+  const originalValue = field.value;
+  btn.classList.add('listening');
+  activeRecognition = recognition;
+
+  recognition.onresult = function(event) {
+    let transcript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    if (append && originalValue) {
+      field.value = originalValue + (originalValue.endsWith(' ') ? '' : ' ') + transcript;
+    } else {
+      field.value = transcript;
+    }
+  };
+
+  recognition.onend = function() {
+    btn.classList.remove('listening');
+    activeRecognition = null;
+  };
+
+  recognition.onerror = function(event) {
+    btn.classList.remove('listening');
+    activeRecognition = null;
+    if (event.error === 'not-allowed') {
+      alert('Microphone access denied. Please allow microphone access in your browser settings.');
+    }
+  };
+
+  recognition.start();
+}
+
+// Global voice command — parses natural language to add tasks, events, habits
+function startVoiceCommand() {
+  if (!speechSupported) { alert('Speech recognition is not supported in this browser. Please use Safari.'); return; }
+  if (activeRecognition) { activeRecognition.stop(); activeRecognition = null; }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-GB';
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+
+  const overlay = document.getElementById('voiceOverlay');
+  const textEl = document.getElementById('voiceText');
+  const fab = document.getElementById('voiceFab');
+  overlay.classList.add('active');
+  fab.classList.add('listening');
+  textEl.textContent = 'Listening...';
+  activeRecognition = recognition;
+
+  let finalTranscript = '';
+
+  recognition.onresult = function(event) {
+    let interim = '';
+    finalTranscript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript;
+      } else {
+        interim += event.results[i][0].transcript;
+      }
+    }
+    textEl.textContent = finalTranscript || interim || 'Listening...';
+  };
+
+  recognition.onend = function() {
+    fab.classList.remove('listening');
+    activeRecognition = null;
+    if (finalTranscript) {
+      processVoiceCommand(finalTranscript.trim());
+    }
+    setTimeout(() => { overlay.classList.remove('active'); }, 1500);
+  };
+
+  recognition.onerror = function(event) {
+    fab.classList.remove('listening');
+    activeRecognition = null;
+    if (event.error === 'not-allowed') {
+      textEl.textContent = 'Microphone access denied';
+    } else {
+      textEl.textContent = 'Could not hear you, try again';
+    }
+    setTimeout(() => { overlay.classList.remove('active'); }, 2000);
+  };
+
+  recognition.start();
+}
+
+function cancelVoiceCommand() {
+  if (activeRecognition) { activeRecognition.stop(); activeRecognition = null; }
+  document.getElementById('voiceOverlay').classList.remove('active');
+  document.getElementById('voiceFab').classList.remove('listening');
+}
+
+function processVoiceCommand(text) {
+  const lower = text.toLowerCase();
+  const textEl = document.getElementById('voiceText');
+
+  // Parse "add task ..."
+  const taskMatch = lower.match(/(?:add|new|create)\s+(?:a\s+)?task\s+(.+)/i);
+  if (taskMatch) {
+    const taskText = capitalise(taskMatch[1]);
+    data.tasks.unshift({ id: Date.now(), text: taskText, done: false, date: dateKey(today) });
+    save(); renderAll();
+    textEl.textContent = '✓ Task added: ' + taskText;
+    return;
+  }
+
+  // Parse "add event ... at ..."
+  const eventMatch = lower.match(/(?:add|new|create)\s+(?:an?\s+)?event\s+(.+)/i);
+  if (eventMatch) {
+    let eventText = eventMatch[1];
+    let time = '';
+    // Try to extract time like "at 3pm", "at 15:00", "at 3:30 pm"
+    const timeMatch = eventText.match(/\s+at\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\s*$/i);
+    if (timeMatch) {
+      eventText = eventText.replace(timeMatch[0], '').trim();
+      time = parseSpokenTime(timeMatch[1]);
+    }
+    const eventName = capitalise(eventText);
+    const targetDate = (currentTab === 'week') ? weekSelectedDate : selectedDate;
+    if (!data.events[targetDate]) data.events[targetDate] = [];
+    data.events[targetDate].push({ name: eventName, time, color: '#7c3aed' });
+    save(); renderAll();
+    textEl.textContent = '✓ Event added: ' + eventName + (time ? ' at ' + time : '');
+    return;
+  }
+
+  // Parse "add habit ..."
+  const habitMatch = lower.match(/(?:add|new|create)\s+(?:a\s+)?habit\s+(.+)/i);
+  if (habitMatch) {
+    const habitText = capitalise(habitMatch[1]);
+    data.habits.push({ id: Date.now(), name: habitText, completions: [] });
+    save(); renderAll();
+    textEl.textContent = '✓ Habit added: ' + habitText;
+    return;
+  }
+
+  // Parse "add note ..."
+  const noteMatch = lower.match(/(?:add|new|create)\s+(?:a\s+)?note\s+(.+)/i);
+  if (noteMatch) {
+    const noteText = capitalise(noteMatch[1]);
+    data.notes.push({ id: Date.now(), title: noteText, body: '', updated: Date.now() });
+    save(); renderAll();
+    textEl.textContent = '✓ Note added: ' + noteText;
+    return;
+  }
+
+  // If we couldn't parse it, add as a task by default
+  const fallbackText = capitalise(text);
+  data.tasks.unshift({ id: Date.now(), text: fallbackText, done: false, date: dateKey(today) });
+  save(); renderAll();
+  textEl.textContent = '✓ Added as task: ' + fallbackText;
+}
+
+function parseSpokenTime(timeStr) {
+  timeStr = timeStr.trim().toLowerCase();
+  let hours, minutes = 0;
+  const pmMatch = timeStr.includes('pm');
+  const amMatch = timeStr.includes('am');
+  const clean = timeStr.replace(/\s*(am|pm)\s*/i, '');
+
+  if (clean.includes(':')) {
+    const parts = clean.split(':');
+    hours = parseInt(parts[0]);
+    minutes = parseInt(parts[1]);
+  } else {
+    hours = parseInt(clean);
+  }
+
+  if (isNaN(hours)) return '';
+  if (pmMatch && hours < 12) hours += 12;
+  if (amMatch && hours === 12) hours = 0;
+
+  return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}`;
+}
+
+function capitalise(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 init();
 </script>
 </body>
