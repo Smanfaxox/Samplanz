@@ -70,6 +70,23 @@
   /* Greeting */
   .greeting { font-size: 16px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 400; }
 
+  /* Weather widget */
+  .weather-widget {
+    background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.12));
+    border: 1px solid rgba(6,182,212,0.2);
+    border-radius: 16px; padding: 14px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .weather-icon { font-size: 36px; line-height: 1; }
+  .weather-info { flex: 1; }
+  .weather-temp { font-size: 24px; font-weight: 800; color: var(--text); }
+  .weather-desc { font-size: 13px; color: var(--text-secondary); text-transform: capitalize; margin-top: 1px; }
+  .weather-details { display: flex; gap: 12px; margin-top: 4px; }
+  .weather-detail { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 3px; }
+  .weather-hi-lo { font-size: 13px; color: var(--text-secondary); text-align: right; }
+  .weather-hi-lo .hi { color: var(--orange); font-weight: 700; }
+  .weather-hi-lo .lo { color: var(--cyan); font-weight: 700; }
+
   /* Tab content */
   .tab-content { display: none; padding: 8px 20px 20px; }
   .tab-content.active { display: block; }
@@ -122,7 +139,9 @@
   .agenda-icon.habit { background: var(--green-light); }
   .agenda-text { flex: 1; }
   .agenda-text .title { font-size: 14px; font-weight: 500; }
+  .agenda-text .title.struck { text-decoration: line-through; color: var(--text-secondary); }
   .agenda-text .subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+  .agenda-item.done-item { opacity: 0.5; }
 
   /* ===== CALENDAR ===== */
   .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -141,18 +160,31 @@
     font-weight: 400; color: var(--text);
   }
   .cal-day:active { background: var(--accent-light); }
-  .cal-day.today { font-weight: 800; color: var(--cyan); }
+  .cal-day.today { font-weight: 800; color: var(--cyan); position: relative; }
+  .cal-day.today::after {
+    content: '\1F98B'; position: absolute; top: -2px; right: -2px;
+    font-size: 10px; line-height: 1; filter: brightness(1.2) saturate(1.5);
+    transform: scaleX(-1);
+  }
   .cal-day.selected {
     background: linear-gradient(135deg, var(--accent), var(--pink));
     color: #fff; font-weight: 700;
     box-shadow: 0 2px 12px var(--accent-glow);
   }
+  .cal-day.has-entries:not(.today):not(.selected) {
+    background: linear-gradient(135deg, var(--green), #059669);
+    color: #fff; font-weight: 700;
+    box-shadow: 0 2px 12px rgba(16,185,129,0.3);
+  }
+  .cal-day.has-entries:not(.today):not(.selected) .dot { background: #fff; }
+  .cal-day.today.has-entries { font-weight: 800; color: var(--cyan); }
   .cal-day.other-month { color: rgba(255,255,255,0.15); }
   .cal-day .dot {
     position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
     width: 4px; height: 4px; border-radius: 50%; background: var(--pink);
   }
   .cal-day.selected .dot { background: #fff; }
+  .cal-day.today .dot { background: #fff; }
 
   .day-events { margin-top: 12px; }
   .day-events h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
@@ -181,7 +213,21 @@
     border-radius: 12px; cursor: pointer; background: var(--card);
     border: 1px solid var(--border); transition: all 0.2s;
   }
-  .week-day-card.today { border-color: var(--cyan); }
+  .week-day-card.has-entries:not(.today):not(.selected) {
+    background: linear-gradient(135deg, var(--green), #059669);
+    border-color: transparent;
+    box-shadow: 0 2px 12px rgba(16,185,129,0.3);
+  }
+  .week-day-card.has-entries:not(.today):not(.selected) .wday,
+  .week-day-card.has-entries:not(.today):not(.selected) .wdate { color: #fff; }
+  .week-day-card.has-entries:not(.today):not(.selected) .wdot { background: #fff; }
+  .week-day-card.today.has-entries { border-color: var(--cyan); }
+  .week-day-card.today { border-color: var(--cyan); position: relative; }
+  .week-day-card.today::after {
+    content: '\1F98B'; position: absolute; top: 2px; right: 3px;
+    font-size: 11px; line-height: 1; filter: brightness(1.2) saturate(1.5);
+    transform: scaleX(-1);
+  }
   .week-day-card.selected {
     background: linear-gradient(135deg, var(--accent), var(--pink));
     border-color: transparent;
@@ -316,6 +362,88 @@
   .shop-text { flex: 1; font-size: 15px; }
   .shop-text.done { text-decoration: line-through; color: var(--text-secondary); }
   .shop-delete { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 4px; }
+  .shop-photo-btn {
+    background: none; border: none; color: var(--text-secondary); font-size: 16px;
+    cursor: pointer; padding: 4px; flex-shrink: 0;
+  }
+  .shop-thumb {
+    width: 40px; height: 40px; border-radius: 8px; object-fit: cover;
+    cursor: pointer; flex-shrink: 0; border: 1px solid var(--border);
+  }
+  .shop-item-wrap { display: flex; flex-direction: column; gap: 0; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .shop-item-wrap:last-child { border-bottom: none; }
+  .shop-item-row { display: flex; align-items: center; gap: 12px; }
+
+  .photo-viewer {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    z-index: 200; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .photo-viewer.active { display: flex; }
+  .photo-viewer img {
+    max-width: 90%; max-height: 80vh; border-radius: 12px;
+    object-fit: contain;
+  }
+  .photo-viewer-close {
+    position: absolute; top: calc(var(--safe-top) + 12px); right: 16px;
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    width: 36px; height: 36px; border-radius: 50%; font-size: 20px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  .shop-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .shop-tab {
+    flex: 1; padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); font-size: 14px; cursor: pointer; color: var(--text-secondary);
+    font-weight: 600; text-align: center; transition: all 0.2s;
+  }
+  .shop-tab.active {
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 2px 12px rgba(16,185,129,0.3);
+  }
+
+  .shop-notes-section { margin-top: 16px; }
+  .shop-notes-label {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-secondary); margin-bottom: 10px; padding-left: 2px;
+  }
+  .shop-notes-area {
+    width: 100%; min-height: 120px; padding: 14px; border-radius: 12px;
+    border: 1px solid var(--border); font-size: 15px; background: var(--bg-secondary);
+    outline: none; font-family: inherit; color: var(--text); resize: vertical;
+    line-height: 1.8;
+    background-image: repeating-linear-gradient(
+      transparent, transparent 27px, var(--border) 27px, var(--border) 28px
+    );
+    background-position: 0 14px;
+  }
+  .shop-notes-area:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .shop-notes-area::placeholder { color: var(--text-secondary); }
+
+  .shop-photos-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
+  }
+  .shop-photo-card {
+    position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .shop-photo-card img {
+    width: 100%; height: 100%; object-fit: cover; cursor: pointer;
+  }
+  .shop-photo-remove {
+    position: absolute; top: 4px; right: 4px;
+    background: rgba(0,0,0,0.6); border: none; color: #fff;
+    width: 22px; height: 22px; border-radius: 50%; font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .shop-add-photo-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 12px; border-radius: 12px; border: 2px dashed var(--border-light);
+    background: transparent; font-size: 15px; color: var(--text-secondary);
+    cursor: pointer; font-weight: 500;
+  }
+  .shop-add-photo-btn:active { background: var(--accent-light); }
 
   .shop-actions { display: flex; gap: 8px; margin-bottom: 12px; }
   .shop-action {
@@ -380,6 +508,55 @@
   .clean-progress-text { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
   /* ===== MODALS ===== */
+  /* Morning pop-up */
+  .morning-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 200; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  .morning-overlay.active { display: flex; }
+  .morning-card {
+    background: linear-gradient(160deg, #1e1e36 0%, #1a1a2e 100%);
+    border-radius: 24px; width: 90%; max-width: 380px;
+    padding: 28px 24px; animation: morningPop 0.4s ease-out;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    max-height: 80vh; overflow-y: auto;
+  }
+  @keyframes morningPop { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+  .morning-header {
+    text-align: center; margin-bottom: 20px;
+  }
+  .morning-emoji { font-size: 40px; margin-bottom: 8px; }
+  .morning-greeting {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .morning-date { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+  .morning-section { margin-bottom: 16px; }
+  .morning-section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .morning-item {
+    font-size: 14px; padding: 8px 12px; background: rgba(255,255,255,0.04);
+    border-radius: 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border);
+  }
+  .morning-item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .morning-item-text { flex: 1; }
+  .morning-item-time { font-size: 12px; color: var(--text-secondary); }
+  .morning-empty { font-size: 13px; color: var(--text-secondary); padding: 4px 0; font-style: italic; }
+  .morning-close {
+    display: block; width: 100%; margin-top: 8px; padding: 14px;
+    border-radius: 14px; border: none; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    box-shadow: 0 4px 16px var(--accent-glow);
+  }
+  .morning-close:active { transform: scale(0.97); }
+
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
     z-index: 100; align-items: flex-end; justify-content: center;
@@ -426,6 +603,33 @@
     box-shadow: 0 4px 20px var(--accent-glow); cursor: pointer; z-index: 40;
   }
   .fab:active { transform: scale(0.92); }
+  .fab-menu {
+    position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 82px);
+    right: 20px; display: none; flex-direction: column; gap: 10px; z-index: 41;
+    align-items: flex-end;
+  }
+  .fab-menu.active { display: flex; }
+  .fab-menu-item {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    animation: fabSlideUp 0.2s ease-out both;
+  }
+  .fab-menu-item:nth-child(1) { animation-delay: 0.05s; }
+  .fab-menu-item:nth-child(2) { animation-delay: 0s; }
+  @keyframes fabSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .fab-menu-label {
+    background: var(--card); color: var(--text); font-size: 13px; font-weight: 600;
+    padding: 8px 14px; border-radius: 10px; white-space: nowrap;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4); border: 1px solid var(--border);
+  }
+  .fab-menu-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: none;
+    color: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .fab-menu-btn.event-btn { background: linear-gradient(135deg, var(--cyan), #0891b2); }
+  .fab-menu-btn.appt-btn { background: linear-gradient(135deg, var(--accent), #6d28d9); }
+  .fab-overlay { position: fixed; inset: 0; z-index: 39; display: none; }
+  .fab-overlay.active { display: block; }
 
   /* Bottom nav */
   .bottom-nav {
@@ -450,6 +654,41 @@
   .empty-state .emoji { font-size: 40px; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; line-height: 1.5; }
 
+  /* ===== DAY NOTES ===== */
+  .day-notes-section { margin-top: 16px; }
+  .day-notes-label {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-secondary); margin-bottom: 10px; padding-left: 2px;
+  }
+  .day-notes-area {
+    width: 100%; min-height: 100px; padding: 14px; border-radius: 12px;
+    border: 1px solid var(--border); font-size: 15px; background: var(--bg-secondary);
+    outline: none; font-family: inherit; color: var(--text); resize: vertical;
+    line-height: 1.8;
+    background-image: repeating-linear-gradient(
+      transparent, transparent 27px, var(--border) 27px, var(--border) 28px
+    );
+    background-position: 0 14px;
+  }
+  .day-notes-area:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .day-notes-area::placeholder { color: var(--text-secondary); }
+
+  /* ===== CONFETTI ===== */
+  .confetti-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999; overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute; top: -20px;
+    width: 10px; height: 10px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
+  }
+
 </style>
 </head>
 <body>
@@ -462,6 +701,18 @@
 
 <!-- TODAY TAB -->
 <div class="tab-content active" id="tab-today">
+  <div class="weather-widget" id="weatherWidget" style="display:none;">
+    <div class="weather-icon" id="weatherIcon"></div>
+    <div class="weather-info">
+      <div class="weather-temp" id="weatherTemp"></div>
+      <div class="weather-desc" id="weatherDesc"></div>
+      <div class="weather-details">
+        <div class="weather-detail" id="weatherWind"></div>
+        <div class="weather-detail" id="weatherHumidity"></div>
+      </div>
+    </div>
+    <div class="weather-hi-lo" id="weatherHiLo"></div>
+  </div>
   <div class="summary-row">
     <div class="summary-card sc-tasks">
       <div class="num" id="sumTasks">0</div>
@@ -477,6 +728,10 @@
     </div>
   </div>
   <div id="todayAgenda"></div>
+  <div class="day-notes-section">
+    <div class="day-notes-label">Notes</div>
+    <textarea class="day-notes-area" id="todayNotes" placeholder="Other stuff..." oninput="saveDayNotes('todayNotes')" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
+  </div>
 </div>
 
 <!-- WEEK TAB -->
@@ -493,6 +748,10 @@
     <h3 id="weekDayTitle" style="font-size:15px;font-weight:700;margin-bottom:12px;"></h3>
     <div id="weekDayEvents"></div>
     <div id="weekTimeline"></div>
+  </div>
+  <div class="day-notes-section">
+    <div class="day-notes-label">Notes</div>
+    <textarea class="day-notes-area" id="weekNotes" placeholder="Other stuff..." oninput="saveDayNotes('weekNotes')" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
   </div>
 </div>
 
@@ -532,7 +791,8 @@
     <input type="text" id="apptTitle" placeholder="Appointment title..." autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
   </div>
   <div class="appt-input-row">
-    <select id="apptTime">
+    <input type="date" id="apptDate" style="flex:1;">
+    <select id="apptTime" style="flex:1;">
       <option value="">Select time...</option>
     </select>
     <button onclick="addAppointment()">Add</button>
@@ -542,6 +802,10 @@
 
 <!-- SHOPPING TAB -->
 <div class="tab-content" id="tab-shopping">
+  <div class="shop-tabs">
+    <button class="shop-tab active" onclick="switchShopCat('masymas', this)">MasyMas</button>
+    <button class="shop-tab" onclick="switchShopCat('mercadona', this)">Mercadona</button>
+  </div>
   <div class="shop-input-row">
     <input type="text" id="shopInput" placeholder="Add an item..." onkeydown="if(event.key==='Enter')addShopItem()" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
     <button onclick="addShopItem()">Add</button>
@@ -551,6 +815,15 @@
     <button class="shop-action" onclick="clearAllShopItems()">Clear all</button>
   </div>
   <div class="card" id="shopList"></div>
+  <div class="shop-notes-section">
+    <div class="shop-notes-label">Notes</div>
+    <textarea class="shop-notes-area" id="shopNotes" placeholder="Something else from somewhere else..." oninput="saveShopNotes()" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
+  </div>
+  <div class="shop-notes-section" style="margin-top:12px;">
+    <div class="shop-notes-label">Photos</div>
+    <div id="shopPhotos" class="shop-photos-grid"></div>
+    <button class="shop-add-photo-btn" onclick="triggerShopPhoto()">&#128247; Add Photo</button>
+  </div>
 </div>
 
 <!-- CLEANING TAB -->
@@ -567,8 +840,26 @@
   <div class="card" id="cleanList"></div>
 </div>
 
+<!-- Photo viewer -->
+<div class="photo-viewer" id="photoViewer" onclick="closePhotoViewer()">
+  <button class="photo-viewer-close" onclick="closePhotoViewer()">&times;</button>
+  <img id="photoViewerImg" src="" alt="Photo">
+</div>
+<input type="file" id="shopPhotoInput" accept="image/*" style="display:none" onchange="handleShopPhoto(event)">
+
 <!-- FAB -->
-<button class="fab" id="fabBtn" onclick="openModal()">+</button>
+<div class="fab-overlay" id="fabOverlay" onclick="closeFabMenu()"></div>
+<div class="fab-menu" id="fabMenu">
+  <div class="fab-menu-item" onclick="closeFabMenu(); openApptModal();">
+    <span class="fab-menu-label">Appointment</span>
+    <button class="fab-menu-btn appt-btn">&#128197;</button>
+  </div>
+  <div class="fab-menu-item" onclick="closeFabMenu(); openModal();">
+    <span class="fab-menu-label">Event</span>
+    <button class="fab-menu-btn event-btn">&#9733;</button>
+  </div>
+</div>
+<button class="fab" id="fabBtn" onclick="toggleFabMenu()">+</button>
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav">
@@ -600,9 +891,25 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22v-2a4 4 0 014-4h2"/><path d="M9 16l-3-3 9-9 3 3-9 9z"/><path d="M14.5 5.5l3 3"/><path d="M18 2l4 4"/></svg>
     Clean
   </button>
+  <button class="nav-item" onclick="window.open('https://docs.google.com/spreadsheets/d/15eYBIZ7DWWZGUmUkYtIt_5jANzy5M53rZwxItHebTes/edit?pli=1&gid=1659577070#gid=1659577070', '_blank')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    Costs
+  </button>
 </nav>
 
 <!-- Modal: Add Event -->
+<div class="morning-overlay" id="morningPopup">
+  <div class="morning-card">
+    <div class="morning-header">
+      <div class="morning-emoji" id="morningEmoji"></div>
+      <div class="morning-greeting" id="morningGreeting"></div>
+      <div class="morning-date" id="morningDate"></div>
+    </div>
+    <div id="morningSummary"></div>
+    <button class="morning-close" onclick="closeMorningPopup()">Let's go!</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="eventModal">
   <div class="modal">
     <h3>New Event</h3>
@@ -619,6 +926,23 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="apptModal">
+  <div class="modal">
+    <h3>New Appointment</h3>
+    <label>Title</label>
+    <input type="text" id="apptModalTitle" placeholder="e.g. Doctor visit" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
+    <label>Date</label>
+    <input type="date" id="apptModalDate">
+    <label>Time</label>
+    <select id="apptModalTime">
+      <option value="">Select time...</option>
+    </select>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeApptModal()">Cancel</button>
+      <button class="modal-save" onclick="saveApptFromModal()">Add Appointment</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ===== DATA =====
@@ -633,6 +957,20 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 if (!data.shopping) data.shopping = [];
 if (!data.cleaning) data.cleaning = [];
 if (!data.appointments) data.appointments = [];
+if (!data.dayNotes) data.dayNotes = {};
+
+// ===== DAY NOTES =====
+function saveDayNotes(textareaId) {
+  const key = textareaId === 'todayNotes' ? dateKey(today) : weekSelectedDate;
+  data.dayNotes[key] = document.getElementById(textareaId).value;
+  save();
+}
+
+function loadDayNotes() {
+  const todayKey = dateKey(today);
+  document.getElementById('todayNotes').value = data.dayNotes[todayKey] || '';
+  document.getElementById('weekNotes').value = data.dayNotes[weekSelectedDate] || '';
+}
 
 // ===== STATE =====
 let currentTab = 'today';
@@ -690,6 +1028,149 @@ function getGreeting() {
   return 'Good evening, Sam';
 }
 
+// ===== WEATHER =====
+function getWeatherEmoji(code) {
+  if (code === 0) return '\u2600\uFE0F';
+  if (code <= 3) return '\u26C5';
+  if (code <= 48) return '\uD83C\uDF2B\uFE0F';
+  if (code <= 57) return '\uD83C\uDF26\uFE0F';
+  if (code <= 67) return '\uD83C\uDF27\uFE0F';
+  if (code <= 77) return '\u2744\uFE0F';
+  if (code <= 82) return '\uD83C\uDF27\uFE0F';
+  if (code <= 86) return '\uD83C\uDF28\uFE0F';
+  if (code <= 99) return '\u26C8\uFE0F';
+  return '\uD83C\uDF24\uFE0F';
+}
+function getWeatherDesc(code) {
+  const descs = {0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+    45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+    56:'Freezing drizzle',57:'Heavy freezing drizzle',
+    61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Heavy freezing rain',
+    71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',
+    80:'Light showers',81:'Showers',82:'Heavy showers',
+    85:'Light snow showers',86:'Heavy snow showers',
+    95:'Thunderstorm',96:'Thunderstorm with hail',99:'Heavy thunderstorm with hail'};
+  return descs[code] || 'Unknown';
+}
+async function loadWeather() {
+  try {
+    // La Nucia coordinates: 38.6097, -0.1074
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=38.6097&longitude=-0.1074&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FMadrid&forecast_days=1';
+    const res = await fetch(url);
+    const d = await res.json();
+    const c = d.current;
+    const daily = d.daily;
+    document.getElementById('weatherIcon').textContent = getWeatherEmoji(c.weather_code);
+    document.getElementById('weatherTemp').textContent = `${Math.round(c.temperature_2m)}\u00B0C`;
+    document.getElementById('weatherDesc').textContent = getWeatherDesc(c.weather_code);
+    document.getElementById('weatherWind').innerHTML = `\uD83D\uDCA8 ${Math.round(c.wind_speed_10m)} km/h`;
+    document.getElementById('weatherHumidity').innerHTML = `\uD83D\uDCA7 ${c.relative_humidity_2m}%`;
+    document.getElementById('weatherHiLo').innerHTML = `<div class="hi">${Math.round(daily.temperature_2m_max[0])}\u00B0</div><div class="lo">${Math.round(daily.temperature_2m_min[0])}\u00B0</div>`;
+    document.getElementById('weatherWidget').style.display = 'flex';
+  } catch(e) { console.log('Weather unavailable', e); }
+}
+
+// ===== MORNING POP-UP =====
+function showMorningPopup() {
+  const lastShown = localStorage.getItem('samplanz_morning_shown');
+  const todayStr = dateKey(today);
+  if (lastShown === todayStr) return; // Already shown today
+
+  const h = today.getHours();
+  let emoji = '&#9728;&#65039;';
+  let greeting = 'Good morning, Sam!';
+  if (h >= 17) { emoji = '&#127769;'; greeting = 'Good evening, Sam!'; }
+  else if (h >= 12) { emoji = '&#9996;&#65039;'; greeting = 'Good afternoon, Sam!'; }
+
+  document.getElementById('morningEmoji').innerHTML = emoji;
+  document.getElementById('morningGreeting').textContent = greeting;
+  document.getElementById('morningDate').textContent = today.toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  const todayKey = dateKey(today);
+  const events = (data.events[todayKey] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const appts = data.appointments.filter(a => a.date === todayKey).sort((a,b) => a.time.localeCompare(b.time));
+  const tasks = data.tasks.filter(t => !t.done);
+  const cleanLeft = data.cleaning.filter(c => c.completedWeek !== getSaturday());
+
+  let html = '';
+
+  // Weather in morning popup
+  try {
+    const wUrl = 'https://api.open-meteo.com/v1/forecast?latitude=38.6097&longitude=-0.1074&current=temperature_2m,weather_code&timezone=Europe%2FMadrid';
+    fetch(wUrl).then(r => r.json()).then(w => {
+      const weatherHtml = `<div class="morning-section"><div class="morning-item" style="justify-content:center;gap:10px;font-size:16px;">
+        <span>${getWeatherEmoji(w.current.weather_code)}</span>
+        <span style="font-weight:700;">${Math.round(w.current.temperature_2m)}\u00B0C</span>
+        <span style="color:var(--text-secondary);font-size:13px;">${getWeatherDesc(w.current.weather_code)}</span>
+      </div></div>`;
+      const summary = document.getElementById('morningSummary');
+      summary.innerHTML = weatherHtml + summary.innerHTML;
+    }).catch(() => {});
+  } catch(e) {}
+
+  // Events
+  if (events.length > 0) {
+    html += '<div class="morning-section"><div class="morning-section-title">&#9733; Events</div>';
+    events.forEach(e => {
+      html += `<div class="morning-item">
+        <div class="morning-item-dot" style="background:${e.color || 'var(--cyan)'}"></div>
+        <div class="morning-item-text">${escHtml(e.name)}</div>
+        <div class="morning-item-time">${e.time || 'All day'}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // Appointments
+  if (appts.length > 0) {
+    html += '<div class="morning-section"><div class="morning-section-title">&#128197; Appointments</div>';
+    appts.forEach(a => {
+      html += `<div class="morning-item">
+        <div class="morning-item-dot" style="background:var(--accent)"></div>
+        <div class="morning-item-text">${escHtml(a.title)}</div>
+        <div class="morning-item-time">${formatApptTime(a.time)}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // Tasks
+  if (tasks.length > 0) {
+    html += '<div class="morning-section"><div class="morning-section-title">&#9745;&#65039; Tasks</div>';
+    tasks.slice(0, 5).forEach(t => {
+      html += `<div class="morning-item">
+        <div class="morning-item-dot" style="background:var(--pink)"></div>
+        <div class="morning-item-text">${escHtml(t.text)}</div>
+      </div>`;
+    });
+    if (tasks.length > 5) html += `<div class="morning-empty">+ ${tasks.length - 5} more</div>`;
+    html += '</div>';
+  }
+
+  // Cleaning
+  if (cleanLeft.length > 0) {
+    html += '<div class="morning-section"><div class="morning-section-title">&#129529; Cleaning</div>';
+    html += `<div class="morning-item">
+      <div class="morning-item-dot" style="background:var(--green)"></div>
+      <div class="morning-item-text">${cleanLeft.length} task${cleanLeft.length > 1 ? 's' : ''} remaining this week</div>
+    </div></div>`;
+  }
+
+  if (!html) {
+    html = '<div class="morning-section"><div class="morning-empty">Nothing planned for today — enjoy your day! &#127796;</div></div>';
+  }
+
+  document.getElementById('morningSummary').innerHTML = html;
+  document.getElementById('morningPopup').classList.add('active');
+}
+
+function closeMorningPopup() {
+  document.getElementById('morningPopup').classList.remove('active');
+  localStorage.setItem('samplanz_morning_shown', dateKey(today));
+}
+
 // ===== INIT =====
 function init() {
   document.getElementById('greeting').textContent = getGreeting();
@@ -698,6 +1179,9 @@ function init() {
   });
   renderColorOptions();
   renderAll();
+  // Show morning popup after a short delay
+  loadWeather();
+  setTimeout(showMorningPopup, 500);
 }
 
 function renderAll() {
@@ -709,6 +1193,7 @@ function renderAll() {
   renderShopping();
   renderCleaning();
   updateSummary();
+  loadDayNotes();
 }
 
 // ===== TABS =====
@@ -727,11 +1212,52 @@ function switchTab(tab) {
   document.getElementById('greeting').style.display = tab === 'today' ? 'block' : 'none';
 }
 
-// ===== FAB =====
+// ===== FAB MENU =====
+function toggleFabMenu() {
+  const menu = document.getElementById('fabMenu');
+  const overlay = document.getElementById('fabOverlay');
+  const isOpen = menu.classList.contains('active');
+  menu.classList.toggle('active');
+  overlay.classList.toggle('active');
+  const fab = document.getElementById('fabBtn');
+  fab.style.transform = isOpen ? '' : 'rotate(45deg)';
+}
+function closeFabMenu() {
+  document.getElementById('fabMenu').classList.remove('active');
+  document.getElementById('fabOverlay').classList.remove('active');
+  document.getElementById('fabBtn').style.transform = '';
+}
+
 function openModal() {
   document.getElementById('eventModal').classList.add('active');
   document.getElementById('eventName').focus();
   renderColorOptions();
+}
+
+function getContextDate() {
+  if (currentTab === 'week') return weekSelectedDate;
+  if (currentTab === 'calendar') return selectedDate;
+  return dateKey(today);
+}
+
+function openApptModal() {
+  document.getElementById('apptModal').classList.add('active');
+  document.getElementById('apptModalDate').value = getContextDate();
+  document.getElementById('apptModalTitle').focus();
+}
+function closeApptModal() {
+  document.getElementById('apptModal').classList.remove('active');
+  document.getElementById('apptModalTitle').value = '';
+  document.getElementById('apptModalTime').value = '';
+}
+function saveApptFromModal() {
+  const title = document.getElementById('apptModalTitle').value.trim();
+  const date = document.getElementById('apptModalDate').value;
+  const time = document.getElementById('apptModalTime').value;
+  if (!title || !time || !date) return;
+  data.appointments.push({ id: Date.now(), title, time, date });
+  data.appointments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  save(); closeApptModal(); renderAll();
 }
 
 // ===== TODAY AGENDA =====
@@ -740,18 +1266,17 @@ function renderTodayAgenda() {
   const todayKey = dateKey(today);
   const events = (data.events[todayKey] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
   const tasks = data.tasks.filter(t => !t.done);
-  const shopItems = data.shopping.filter(s => !s.done);
 
   let html = '';
 
   if (events.length > 0) {
     html += '<div class="agenda-section"><h3>Events</h3>';
-    events.forEach(e => {
-      html += `<div class="agenda-item">
+    events.forEach((e, i) => {
+      html += `<div class="agenda-item ${e.done ? 'done-item' : ''}" onclick="toggleEventDone('${todayKey}',${i});" style="cursor:pointer;">
         <div class="agenda-icon event" style="background:${e.color || 'var(--cyan-light)'}22;">
           <div style="width:10px;height:10px;border-radius:50%;background:${e.color || 'var(--cyan)'}"></div>
         </div>
-        <div class="agenda-text"><div class="title">${escHtml(e.name)}</div><div class="subtitle">${e.time || 'All day'}</div></div>
+        <div class="agenda-text"><div class="title ${e.done ? 'struck' : ''}">${escHtml(e.name)}</div><div class="subtitle">${e.time || 'All day'}</div></div>
       </div>`;
     });
     html += '</div>';
@@ -773,20 +1298,11 @@ function renderTodayAgenda() {
   if (todayAppts.length > 0) {
     html += '<div class="agenda-section"><h3>Appointments</h3>';
     todayAppts.forEach(a => {
-      html += `<div class="agenda-item">
+      html += `<div class="agenda-item ${a.done ? 'done-item' : ''}" onclick="toggleApptDone(${a.id});" style="cursor:pointer;">
         <div class="agenda-icon" style="background:var(--accent-light);"><div style="width:10px;height:10px;border-radius:50%;background:var(--accent)"></div></div>
-        <div class="agenda-text"><div class="title">${escHtml(a.title)}</div><div class="subtitle">${formatApptTime(a.time)}</div></div>
+        <div class="agenda-text"><div class="title ${a.done ? 'struck' : ''}">${escHtml(a.title)}</div><div class="subtitle">${formatApptTime(a.time)}</div></div>
       </div>`;
     });
-    html += '</div>';
-  }
-
-  if (shopItems.length > 0) {
-    html += '<div class="agenda-section"><h3>Shopping</h3>';
-    html += `<div class="agenda-item" onclick="switchTab('shopping');" style="cursor:pointer;">
-      <div class="agenda-icon" style="background:var(--green-light);"><div style="width:10px;height:10px;border-radius:50%;background:var(--green)"></div></div>
-      <div class="agenda-text"><div class="title">${shopItems.length} item${shopItems.length !== 1 ? 's' : ''} on your list</div><div class="subtitle">Tap to view</div></div>
-    </div>`;
     html += '</div>';
   }
 
@@ -803,7 +1319,7 @@ function renderTodayAgenda() {
     html += '</div>';
   }
 
-  if (!events.length && !tasks.length && !todayAppts.length && !shopItems.length && !cleanLeft.length) {
+  if (!events.length && !tasks.length && !todayAppts.length && !cleanLeft.length) {
     html = '<div class="empty-state"><div class="emoji">&#10024;</div><p>Your day is clear! Add some events, tasks, or shopping items to get started.</p></div>';
   }
 
@@ -835,8 +1351,8 @@ function renderWeek() {
     const key = dateKey(d);
     const isToday = key === todayKey;
     const isSelected = key === weekSelectedDate;
-    const hasEvents = data.events[key] && data.events[key].length > 0;
-    stripHtml += `<div class="week-day-card ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}" onclick="selectWeekDay('${key}')">
+    const hasEvents = (data.events[key] && data.events[key].length > 0) || data.appointments.some(a => a.date === key);
+    stripHtml += `<div class="week-day-card ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvents ? 'has-entries' : ''}" onclick="selectWeekDay('${key}')">
       <div class="wday">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</div>
       <div class="wdate">${d.getDate()}</div>
       ${hasEvents ? '<div class="wdot"></div>' : ''}
@@ -844,36 +1360,73 @@ function renderWeek() {
   }
   strip.innerHTML = stripHtml;
 
-  // Day detail
+  // Day detail — Today-style agenda
   document.getElementById('weekDayTitle').textContent = formatDate(weekSelectedDate);
-  const events = (data.events[weekSelectedDate] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
   const evList = document.getElementById('weekDayEvents');
-
-  if (events.length === 0) {
-    evList.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p>No events for this day</p></div>';
-  } else {
-    evList.innerHTML = events.map((e, i) => `
-      <div class="event-item">
-        <div class="event-dot" style="background:${e.color || '#7c3aed'}"></div>
-        <div class="event-time">${e.time || 'All day'}</div>
-        <div class="event-title">${escHtml(e.name)}</div>
-        <button class="event-delete" onclick="deleteEvent('${weekSelectedDate}',${i}); renderAll();">\u00d7</button>
-      </div>
-    `).join('');
-  }
-
-  // Tasks for that day
-  const dayTasks = data.tasks.filter(t => t.date === weekSelectedDate);
   const timeline = document.getElementById('weekTimeline');
-  if (dayTasks.length > 0) {
-    timeline.innerHTML = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:12px;color:var(--text-secondary);font-weight:600;margin-bottom:8px;text-transform:uppercase">Tasks</div>' +
-      dayTasks.map(t => `<div class="event-item">
-        <div class="task-checkbox ${t.done?'checked':''}" onclick="toggleTask(${t.id}); renderAll();" style="width:18px;height:18px;"></div>
-        <div class="event-title ${t.done?'task-text done':''}">${escHtml(t.text)}</div>
-      </div>`).join('') + '</div>';
-  } else {
-    timeline.innerHTML = '';
+  timeline.innerHTML = '';
+
+  const events = (data.events[weekSelectedDate] || []).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const activeTasks = data.tasks.filter(t => !t.done);
+  const dayAppts = data.appointments.filter(a => a.date === weekSelectedDate).sort((a,b) => a.time.localeCompare(b.time));
+  const cleanLeft = data.cleaning.filter(c => c.completedWeek !== getSaturday());
+
+  let html = '';
+
+  if (events.length > 0) {
+    html += '<div class="agenda-section"><h3>Events</h3>';
+    events.forEach((e, i) => {
+      html += `<div class="agenda-item ${e.done ? 'done-item' : ''}" onclick="toggleEventDone('${weekSelectedDate}',${i});" style="cursor:pointer;">
+        <div class="agenda-icon event" style="background:${e.color || 'var(--cyan-light)'}22;">
+          <div style="width:10px;height:10px;border-radius:50%;background:${e.color || 'var(--cyan)'}"></div>
+        </div>
+        <div class="agenda-text"><div class="title ${e.done ? 'struck' : ''}">${escHtml(e.name)}</div><div class="subtitle">${e.time || 'All day'}</div></div>
+        <button class="event-delete" onclick="event.stopPropagation(); deleteEvent('${weekSelectedDate}',${i}); renderAll();">\u00d7</button>
+      </div>`;
+    });
+    html += '</div>';
   }
+
+  if (dayAppts.length > 0) {
+    html += '<div class="agenda-section"><h3>Appointments</h3>';
+    dayAppts.forEach(a => {
+      html += `<div class="agenda-item ${a.done ? 'done-item' : ''}" onclick="toggleApptDone(${a.id});" style="cursor:pointer;">
+        <div class="agenda-icon" style="background:var(--accent-light);"><div style="width:10px;height:10px;border-radius:50%;background:var(--accent)"></div></div>
+        <div class="agenda-text"><div class="title ${a.done ? 'struck' : ''}">${escHtml(a.title)}</div><div class="subtitle">${formatApptTime(a.time)}</div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (activeTasks.length > 0) {
+    html += '<div class="agenda-section"><h3>Active Tasks</h3>';
+    activeTasks.slice(0, 5).forEach(t => {
+      html += `<div class="agenda-item" onclick="toggleTask(${t.id}); renderAll();">
+        <div class="agenda-icon task"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--pink)"></div></div>
+        <div class="agenda-text"><div class="title">${escHtml(t.text)}</div></div>
+      </div>`;
+    });
+    if (activeTasks.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${activeTasks.length - 5} more tasks</div>`;
+    html += '</div>';
+  }
+
+  if (cleanLeft.length > 0) {
+    html += '<div class="agenda-section"><h3>Cleaning to do</h3>';
+    cleanLeft.slice(0, 5).forEach(c => {
+      html += `<div class="agenda-item" onclick="toggleCleanTask(${c.id}); renderAll();">
+        <div class="agenda-icon" style="background:var(--orange-light);"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--orange)"></div></div>
+        <div class="agenda-text"><div class="title">${escHtml(c.text)}</div><div class="subtitle">Tap to complete</div></div>
+      </div>`;
+    });
+    if (cleanLeft.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${cleanLeft.length - 5} more tasks</div>`;
+    html += '</div>';
+  }
+
+  if (!events.length && !dayAppts.length && !activeTasks.length && !cleanLeft.length) {
+    html = '<div class="empty-state"><div class="emoji">&#10024;</div><p>Nothing for this day yet. Tap + to add an event.</p></div>';
+  }
+
+  evList.innerHTML = html;
 }
 
 function selectWeekDay(key) {
@@ -919,8 +1472,10 @@ function renderCalendar() {
     el.className = 'cal-day';
     if (key === todayKey) el.classList.add('today');
     if (key === selectedDate) el.classList.add('selected');
+    const hasEntries = (data.events[key] && data.events[key].length > 0) || data.appointments.some(a => a.date === key);
+    if (hasEntries) el.classList.add('has-entries');
     el.textContent = d;
-    if (data.events[key] && data.events[key].length > 0) {
+    if (hasEntries) {
       const dot = document.createElement('div'); dot.className = 'dot'; el.appendChild(dot);
     }
     el.onclick = () => { selectedDate = key; renderCalendar(); renderDayEvents(); updateSummary(); };
@@ -945,11 +1500,11 @@ function renderDayEvents() {
     return;
   }
   list.innerHTML = events.sort((a,b) => (a.time||'').localeCompare(b.time||''))
-    .map((e, i) => `<div class="event-item">
+    .map((e, i) => `<div class="event-item" onclick="toggleEventDone('${selectedDate}',${i});" style="cursor:pointer;${e.done ? 'opacity:0.5;' : ''}">
       <div class="event-dot" style="background:${e.color || '#7c3aed'}"></div>
       <div class="event-time">${e.time || 'All day'}</div>
-      <div class="event-title">${escHtml(e.name)}</div>
-      <button class="event-delete" onclick="deleteEvent('${selectedDate}',${i}); renderAll();">\u00d7</button>
+      <div class="event-title" style="${e.done ? 'text-decoration:line-through;color:var(--text-secondary)' : ''}">${escHtml(e.name)}</div>
+      <button class="event-delete" onclick="event.stopPropagation(); deleteEvent('${selectedDate}',${i}); renderAll();">\u00d7</button>
     </div>`).join('');
 }
 
@@ -962,10 +1517,18 @@ function saveEvent() {
   data.events[targetDate].push({ name, time, color: selectedColor });
   save(); closeModal(); renderAll();
 }
+function toggleEventDone(date, idx) {
+  const ev = data.events[date][idx];
+  if (ev) { ev.done = !ev.done; save(); renderAll(); }
+}
 function deleteEvent(date, idx) {
   data.events[date].splice(idx, 1);
   if (data.events[date].length === 0) delete data.events[date];
   save(); renderAll();
+}
+function toggleApptDone(id) {
+  const a = data.appointments.find(x => x.id === id);
+  if (a) { a.done = !a.done; save(); renderAll(); }
 }
 function closeModal() {
   document.getElementById('eventModal').classList.remove('active');
@@ -1013,31 +1576,90 @@ function renderTasks() {
 
 // ===== APPOINTMENTS =====
 function buildTimeOptions() {
-  const sel = document.getElementById('apptTime');
-  for (let h = 0; h < 24; h++) {
-    for (let m = 0; m < 60; m += 15) {
-      const hh = String(h).padStart(2, '0');
-      const mm = String(m).padStart(2, '0');
-      const val = `${hh}:${mm}`;
-      const label = `${h > 12 ? h - 12 : (h === 0 ? 12 : h)}:${mm} ${h >= 12 ? 'PM' : 'AM'}`;
-      const opt = document.createElement('option');
-      opt.value = val;
-      opt.textContent = label;
-      sel.appendChild(opt);
+  const selectors = [document.getElementById('apptTime'), document.getElementById('apptModalTime')];
+  selectors.forEach(sel => {
+    if (!sel) return;
+    for (let h = 7; h <= 23; h++) {
+      for (let m = 0; m < 60; m += 5) {
+        const hh = String(h).padStart(2, '0');
+        const mm = String(m).padStart(2, '0');
+        const val = `${hh}:${mm}`;
+        const label = `${h > 12 ? h - 12 : (h === 0 ? 12 : h)}:${mm} ${h >= 12 ? 'PM' : 'AM'}`;
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      }
     }
+    // Add custom time option
+    const custom = document.createElement('option');
+    custom.value = 'custom';
+    custom.textContent = 'Custom time...';
+    sel.appendChild(custom);
+    sel.addEventListener('change', function() {
+      if (this.value === 'custom') {
+        const input = prompt('Enter time (e.g. 6:30 AM or 14:25):');
+        if (input) {
+          const parsed = parseCustomTime(input);
+          if (parsed) {
+            // Add option if not already present
+            let found = false;
+            for (let o of this.options) { if (o.value === parsed) { found = true; break; } }
+            if (!found) {
+              const newOpt = document.createElement('option');
+              newOpt.value = parsed;
+              const ph = parseInt(parsed.split(':')[0]);
+              const pm = parsed.split(':')[1];
+              newOpt.textContent = `${ph > 12 ? ph - 12 : (ph === 0 ? 12 : ph)}:${pm} ${ph >= 12 ? 'PM' : 'AM'}`;
+              this.insertBefore(newOpt, this.lastElementChild);
+            }
+            this.value = parsed;
+          } else {
+            alert('Could not understand that time. Try formats like "6:30 AM" or "14:25".');
+            this.value = '';
+          }
+        } else {
+          this.value = '';
+        }
+      }
+    });
+  });
+}
+function parseCustomTime(input) {
+  input = input.trim().toUpperCase();
+  // Try 12h format: 6:30 AM, 6:30AM, 6:30 PM
+  let match = input.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+  if (match) {
+    let h = parseInt(match[1]);
+    const m = parseInt(match[2]);
+    const ampm = match[3];
+    if (ampm === 'PM' && h < 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    if (h >= 0 && h <= 23 && m >= 0 && m <= 59) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
   }
+  // Try 24h format: 14:25
+  match = input.match(/^(\d{1,2}):(\d{2})$/);
+  if (match) {
+    const h = parseInt(match[1]);
+    const m = parseInt(match[2]);
+    if (h >= 0 && h <= 23 && m >= 0 && m <= 59) return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  }
+  return null;
 }
 buildTimeOptions();
+document.getElementById('apptDate').value = dateKey(today);
 
 function addAppointment() {
   const title = document.getElementById('apptTitle').value.trim();
   const time = document.getElementById('apptTime').value;
-  if (!title || !time) return;
-  data.appointments.push({ id: Date.now(), title, time, date: dateKey(today) });
-  data.appointments.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  const date = document.getElementById('apptDate').value;
+  if (!title || !time || !date) return;
+  data.appointments.push({ id: Date.now(), title, time, date });
+  data.appointments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   save();
   document.getElementById('apptTitle').value = '';
   document.getElementById('apptTime').value = '';
+  document.getElementById('apptDate').value = dateKey(today);
   renderAll();
 }
 
@@ -1067,13 +1689,13 @@ function renderAppointments() {
   if (upcoming.length > 0) {
     upcoming.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
     upcoming.forEach(a => {
-      html += `<div class="appt-item">
+      html += `<div class="appt-item ${a.done ? 'done-item' : ''}" onclick="toggleApptDone(${a.id});" style="cursor:pointer;">
         <div class="appt-time-badge">${formatApptTime(a.time)}</div>
         <div class="appt-details">
-          <div class="appt-title">${escHtml(a.title)}</div>
+          <div class="appt-title" style="${a.done ? 'text-decoration:line-through;color:var(--text-secondary)' : ''}">${escHtml(a.title)}</div>
           <div class="appt-date">${formatDate(a.date)}</div>
         </div>
-        <button class="appt-delete" onclick="deleteAppointment(${a.id})">\u00d7</button>
+        <button class="appt-delete" onclick="event.stopPropagation(); deleteAppointment(${a.id})">\u00d7</button>
       </div>`;
     });
   }
@@ -1095,11 +1717,34 @@ function renderAppointments() {
 }
 
 // ===== SHOPPING LIST =====
+let activeShopCat = 'masymas';
+
+function switchShopCat(cat, btn) {
+  activeShopCat = cat;
+  document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderShopping();
+  loadShopNotes();
+}
+
+// Migrate old items without a category
+data.shopping.forEach(s => { if (!s.cat) s.cat = 'masymas'; });
+if (!data.shopNotes) data.shopNotes = { masymas: '', mercadona: '' };
+
+function saveShopNotes() {
+  data.shopNotes[activeShopCat] = document.getElementById('shopNotes').value;
+  save();
+}
+
+function loadShopNotes() {
+  document.getElementById('shopNotes').value = data.shopNotes[activeShopCat] || '';
+}
+
 function addShopItem() {
   const input = document.getElementById('shopInput');
   const text = input.value.trim();
   if (!text) return;
-  data.shopping.push({ id: Date.now(), text, done: false });
+  data.shopping.push({ id: Date.now(), text, done: false, photo: null, cat: activeShopCat });
   save(); input.value = ''; renderAll();
 }
 
@@ -1114,42 +1759,105 @@ function deleteShopItem(id) {
 }
 
 function clearCheckedItems() {
-  data.shopping = data.shopping.filter(s => !s.done);
+  data.shopping = data.shopping.filter(s => !(s.done && s.cat === activeShopCat));
   save(); renderAll();
 }
 
 function clearAllShopItems() {
-  data.shopping = [];
+  data.shopping = data.shopping.filter(s => s.cat !== activeShopCat);
   save(); renderAll();
+}
+
+// Migrate shopPhotos
+if (!data.shopPhotos) data.shopPhotos = { masymas: [], mercadona: [] };
+
+function triggerShopPhoto() {
+  document.getElementById('shopPhotoInput').click();
+}
+
+function handleShopPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxSize = 300;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+      else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      if (!data.shopPhotos[activeShopCat]) data.shopPhotos[activeShopCat] = [];
+      data.shopPhotos[activeShopCat].push({ id: Date.now(), src: dataUrl });
+      save(); renderShopPhotos();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function removeShopPhoto(id) {
+  data.shopPhotos[activeShopCat] = (data.shopPhotos[activeShopCat] || []).filter(p => p.id !== id);
+  save(); renderShopPhotos();
+}
+
+function renderShopPhotos() {
+  const container = document.getElementById('shopPhotos');
+  const photos = data.shopPhotos[activeShopCat] || [];
+  if (photos.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = photos.map(p => `
+    <div class="shop-photo-card">
+      <img src="${p.src}" onclick="viewPhoto('${p.src.replace(/'/g, "\\'")}')">
+      <button class="shop-photo-remove" onclick="removeShopPhoto(${p.id})">&times;</button>
+    </div>
+  `).join('');
+}
+
+function viewPhoto(src) {
+  document.getElementById('photoViewerImg').src = src;
+  document.getElementById('photoViewer').classList.add('active');
+}
+
+function closePhotoViewer() {
+  document.getElementById('photoViewer').classList.remove('active');
+  document.getElementById('photoViewerImg').src = '';
+}
+
+function shopItemHtml(s, isDone) {
+  const checkClass = isDone ? 'shop-check checked' : 'shop-check';
+  const textClass = isDone ? 'shop-text done' : 'shop-text';
+  return `<div class="shop-item">
+    <div class="${checkClass}" onclick="toggleShopItem(${s.id})"></div>
+    <div class="${textClass}">${escHtml(s.text)}</div>
+    <button class="shop-delete" onclick="deleteShopItem(${s.id})">\u00d7</button>
+  </div>`;
 }
 
 function renderShopping() {
   const list = document.getElementById('shopList');
-  if (data.shopping.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="emoji">&#128722;</div><p>Your shopping list is empty. Add items above!</p></div>';
+  const catItems = data.shopping.filter(s => s.cat === activeShopCat);
+  if (catItems.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="emoji">&#128722;</div><p>Your ${activeShopCat === 'masymas' ? 'MasyMas' : 'Mercadona'} list is empty. Add items above!</p></div>`;
     return;
   }
-  const unchecked = data.shopping.filter(s => !s.done);
-  const checked = data.shopping.filter(s => s.done);
+  const unchecked = catItems.filter(s => !s.done);
+  const checked = catItems.filter(s => s.done);
   let html = '';
-  unchecked.forEach(s => {
-    html += `<div class="shop-item">
-      <div class="shop-check" onclick="toggleShopItem(${s.id})"></div>
-      <div class="shop-text">${escHtml(s.text)}</div>
-      <button class="shop-delete" onclick="deleteShopItem(${s.id})">\u00d7</button>
-    </div>`;
-  });
+  unchecked.forEach(s => { html += shopItemHtml(s, false); });
   if (checked.length > 0) {
     html += `<div style="font-size:12px;color:var(--text-secondary);font-weight:600;padding:12px 0 6px;text-transform:uppercase;">Ticked off (${checked.length})</div>`;
-    checked.forEach(s => {
-      html += `<div class="shop-item">
-        <div class="shop-check checked" onclick="toggleShopItem(${s.id})"></div>
-        <div class="shop-text done">${escHtml(s.text)}</div>
-        <button class="shop-delete" onclick="deleteShopItem(${s.id})">\u00d7</button>
-      </div>`;
-    });
+    checked.forEach(s => { html += shopItemHtml(s, true); });
   }
   list.innerHTML = html;
+  loadShopNotes();
+  renderShopPhotos();
 }
 
 // ===== CLEANING (recurring every Saturday) =====
@@ -1186,8 +1894,34 @@ function addCleanTask() {
 function toggleCleanTask(id) {
   const task = data.cleaning.find(c => c.id === id);
   if (!task) return;
+  const wasIncomplete = task.completedWeek !== currentWeekSat;
   task.completedWeek = task.completedWeek === currentWeekSat ? null : currentWeekSat;
   save(); renderAll();
+  if (wasIncomplete) launchConfetti();
+}
+
+function launchConfetti() {
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  const colors = ['#7c3aed','#ec4899','#06b6d4','#10b981','#f97316','#facc15','#ef4444','#8b5cf6','#fff'];
+  const shapes = ['square','circle','rect'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const size = 6 + Math.random() * 8;
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = color;
+    piece.style.width = shape === 'rect' ? size * 0.5 + 'px' : size + 'px';
+    piece.style.height = size + 'px';
+    piece.style.borderRadius = shape === 'circle' ? '50%' : '2px';
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.remove(), 4000);
 }
 
 function deleteCleanTask(id) {
