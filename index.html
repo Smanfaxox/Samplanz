@@ -393,73 +393,6 @@
   .empty-state .emoji { font-size: 40px; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; line-height: 1.5; }
 
-  /* ===== VOICE / MIC ===== */
-  .mic-btn {
-    width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--border);
-    background: var(--bg-secondary); color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0; transition: all 0.2s;
-  }
-  .mic-btn:active { background: var(--accent-light); }
-  .mic-btn.listening {
-    background: var(--red-light); border-color: var(--red);
-    color: var(--red); animation: pulse 1.2s ease-in-out infinite;
-  }
-  .mic-btn svg { width: 20px; height: 20px; }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
-    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
-  }
-
-  .voice-fab {
-    position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
-    left: 20px; width: 54px; height: 54px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--cyan), var(--green));
-    color: #fff; border: none; font-size: 22px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 20px rgba(6,182,212,0.4); cursor: pointer; z-index: 40;
-  }
-  .voice-fab:active { transform: scale(0.92); }
-  .voice-fab.listening {
-    background: linear-gradient(135deg, var(--red), var(--orange));
-    box-shadow: 0 4px 20px rgba(239,68,68,0.4);
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-  .voice-fab svg { width: 24px; height: 24px; }
-
-  /* Voice command overlay */
-  .voice-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-    z-index: 200; align-items: center; justify-content: center;
-    flex-direction: column; backdrop-filter: blur(8px);
-  }
-  .voice-overlay.active { display: flex; }
-  .voice-overlay .voice-circle {
-    width: 120px; height: 120px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--pink));
-    display: flex; align-items: center; justify-content: center;
-    animation: pulse-big 1.5s ease-in-out infinite;
-  }
-  .voice-overlay .voice-circle svg { width: 48px; height: 48px; color: #fff; }
-  @keyframes pulse-big {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.5); transform: scale(1); }
-    50% { box-shadow: 0 0 0 20px rgba(124,58,237,0); transform: scale(1.05); }
-  }
-  .voice-overlay .voice-text {
-    margin-top: 24px; font-size: 18px; font-weight: 600;
-    color: var(--text); text-align: center; max-width: 280px;
-  }
-  .voice-overlay .voice-hint {
-    margin-top: 8px; font-size: 13px; color: var(--text-secondary);
-    text-align: center; max-width: 280px; line-height: 1.4;
-  }
-  .voice-overlay .voice-cancel {
-    margin-top: 32px; padding: 12px 32px; border-radius: 12px;
-    border: 1px solid var(--border-light); background: transparent;
-    color: var(--text); font-size: 15px; cursor: pointer; font-weight: 500;
-  }
-
-  .mic-inline { display: inline-flex; }
 </style>
 </head>
 <body>
@@ -526,7 +459,6 @@
 <div class="tab-content" id="tab-tasks">
   <div class="task-input-row">
     <input type="text" id="taskInput" placeholder="What needs doing?" onkeydown="if(event.key==='Enter')addTask()">
-    <button class="mic-btn" id="taskMic" onclick="startFieldVoice('taskInput', 'taskMic')" title="Dictate task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
     <button onclick="addTask()">Add</button>
   </div>
   <div class="task-filters">
@@ -548,14 +480,8 @@
         <button class="note-save" onclick="saveCurrentNote()">Save</button>
       </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <input type="text" id="noteTitle" placeholder="Title" style="flex:1;">
-      <button class="mic-btn" id="noteTitleMic" onclick="startFieldVoice('noteTitle', 'noteTitleMic')" title="Dictate title" style="width:38px;height:38px;border-radius:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-    </div>
-    <div style="position:relative;">
-      <textarea id="noteBody" placeholder="Start writing..."></textarea>
-      <button class="mic-btn" id="noteBodyMic" onclick="startFieldVoice('noteBody', 'noteBodyMic', true)" title="Dictate note" style="position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-    </div>
+    <input type="text" id="noteTitle" placeholder="Title">
+    <textarea id="noteBody" placeholder="Start writing..."></textarea>
   </div>
   <button class="add-note-btn" id="addNoteBtn" onclick="openNewNote()">+ New Note</button>
 </div>
@@ -563,21 +489,6 @@
 <!-- HABITS TAB -->
 <div class="tab-content" id="tab-habits">
   <div class="card" id="habitList"></div>
-</div>
-
-<!-- Voice command FAB -->
-<button class="voice-fab" id="voiceFab" onclick="startVoiceCommand()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-</button>
-
-<!-- Voice overlay -->
-<div class="voice-overlay" id="voiceOverlay">
-  <div class="voice-circle">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-  </div>
-  <div class="voice-text" id="voiceText">Listening...</div>
-  <div class="voice-hint" id="voiceHint">Say something like:<br>"Add task buy groceries"<br>"Add event dentist at 3pm"<br>"Add habit drink water"</div>
-  <button class="voice-cancel" onclick="cancelVoiceCommand()">Cancel</button>
 </div>
 
 <!-- FAB -->
@@ -616,10 +527,7 @@
   <div class="modal">
     <h3>New Event</h3>
     <label>Event name</label>
-    <div style="display:flex;gap:8px;margin-bottom:14px;">
-      <input type="text" id="eventName" placeholder="e.g. Team standup" style="margin-bottom:0;">
-      <button class="mic-btn" id="eventMic" onclick="startFieldVoice('eventName', 'eventMic')" title="Dictate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-    </div>
+    <input type="text" id="eventName" placeholder="e.g. Team standup">
     <label>Time</label>
     <input type="time" id="eventTime">
     <label>Colour</label>
@@ -1154,211 +1062,6 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
 // Close modals on backdrop
 document.getElementById('eventModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 document.getElementById('habitModal').addEventListener('click', function(e) { if (e.target === this) closeHabitModal(); });
-
-// ===== SPEECH RECOGNITION =====
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let speechSupported = !!SpeechRecognition;
-let activeRecognition = null;
-
-// Hide voice buttons if not supported
-if (!speechSupported) {
-  document.getElementById('voiceFab').style.display = 'none';
-  document.querySelectorAll('.mic-btn').forEach(b => b.style.display = 'none');
-}
-
-// Field-level voice input (for task input, event name, note title/body)
-function startFieldVoice(fieldId, btnId, append) {
-  if (!speechSupported) { alert('Speech recognition is not supported in this browser. Please use Safari.'); return; }
-  if (activeRecognition) { activeRecognition.stop(); return; }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'en-GB';
-  recognition.interimResults = true;
-  recognition.maxAlternatives = 1;
-  recognition.continuous = !!append;
-
-  const btn = document.getElementById(btnId);
-  const field = document.getElementById(fieldId);
-  const originalValue = field.value;
-  btn.classList.add('listening');
-  activeRecognition = recognition;
-
-  recognition.onresult = function(event) {
-    let transcript = '';
-    for (let i = 0; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
-    }
-    if (append && originalValue) {
-      field.value = originalValue + (originalValue.endsWith(' ') ? '' : ' ') + transcript;
-    } else {
-      field.value = transcript;
-    }
-  };
-
-  recognition.onend = function() {
-    btn.classList.remove('listening');
-    activeRecognition = null;
-  };
-
-  recognition.onerror = function(event) {
-    btn.classList.remove('listening');
-    activeRecognition = null;
-    if (event.error === 'not-allowed') {
-      alert('Microphone access denied. Please allow microphone access in your browser settings.');
-    }
-  };
-
-  recognition.start();
-}
-
-// Global voice command — parses natural language to add tasks, events, habits
-function startVoiceCommand() {
-  if (!speechSupported) { alert('Speech recognition is not supported in this browser. Please use Safari.'); return; }
-  if (activeRecognition) { activeRecognition.stop(); activeRecognition = null; }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'en-GB';
-  recognition.interimResults = true;
-  recognition.maxAlternatives = 1;
-
-  const overlay = document.getElementById('voiceOverlay');
-  const textEl = document.getElementById('voiceText');
-  const fab = document.getElementById('voiceFab');
-  overlay.classList.add('active');
-  fab.classList.add('listening');
-  textEl.textContent = 'Listening...';
-  activeRecognition = recognition;
-
-  let finalTranscript = '';
-
-  recognition.onresult = function(event) {
-    let interim = '';
-    finalTranscript = '';
-    for (let i = 0; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        finalTranscript += event.results[i][0].transcript;
-      } else {
-        interim += event.results[i][0].transcript;
-      }
-    }
-    textEl.textContent = finalTranscript || interim || 'Listening...';
-  };
-
-  recognition.onend = function() {
-    fab.classList.remove('listening');
-    activeRecognition = null;
-    if (finalTranscript) {
-      processVoiceCommand(finalTranscript.trim());
-    }
-    setTimeout(() => { overlay.classList.remove('active'); }, 1500);
-  };
-
-  recognition.onerror = function(event) {
-    fab.classList.remove('listening');
-    activeRecognition = null;
-    if (event.error === 'not-allowed') {
-      textEl.textContent = 'Microphone access denied';
-    } else {
-      textEl.textContent = 'Could not hear you, try again';
-    }
-    setTimeout(() => { overlay.classList.remove('active'); }, 2000);
-  };
-
-  recognition.start();
-}
-
-function cancelVoiceCommand() {
-  if (activeRecognition) { activeRecognition.stop(); activeRecognition = null; }
-  document.getElementById('voiceOverlay').classList.remove('active');
-  document.getElementById('voiceFab').classList.remove('listening');
-}
-
-function processVoiceCommand(text) {
-  const lower = text.toLowerCase();
-  const textEl = document.getElementById('voiceText');
-
-  // Parse "add task ..."
-  const taskMatch = lower.match(/(?:add|new|create)\s+(?:a\s+)?task\s+(.+)/i);
-  if (taskMatch) {
-    const taskText = capitalise(taskMatch[1]);
-    data.tasks.unshift({ id: Date.now(), text: taskText, done: false, date: dateKey(today) });
-    save(); renderAll();
-    textEl.textContent = '✓ Task added: ' + taskText;
-    return;
-  }
-
-  // Parse "add event ... at ..."
-  const eventMatch = lower.match(/(?:add|new|create)\s+(?:an?\s+)?event\s+(.+)/i);
-  if (eventMatch) {
-    let eventText = eventMatch[1];
-    let time = '';
-    // Try to extract time like "at 3pm", "at 15:00", "at 3:30 pm"
-    const timeMatch = eventText.match(/\s+at\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\s*$/i);
-    if (timeMatch) {
-      eventText = eventText.replace(timeMatch[0], '').trim();
-      time = parseSpokenTime(timeMatch[1]);
-    }
-    const eventName = capitalise(eventText);
-    const targetDate = (currentTab === 'week') ? weekSelectedDate : selectedDate;
-    if (!data.events[targetDate]) data.events[targetDate] = [];
-    data.events[targetDate].push({ name: eventName, time, color: '#7c3aed' });
-    save(); renderAll();
-    textEl.textContent = '✓ Event added: ' + eventName + (time ? ' at ' + time : '');
-    return;
-  }
-
-  // Parse "add habit ..."
-  const habitMatch = lower.match(/(?:add|new|create)\s+(?:a\s+)?habit\s+(.+)/i);
-  if (habitMatch) {
-    const habitText = capitalise(habitMatch[1]);
-    data.habits.push({ id: Date.now(), name: habitText, completions: [] });
-    save(); renderAll();
-    textEl.textContent = '✓ Habit added: ' + habitText;
-    return;
-  }
-
-  // Parse "add note ..."
-  const noteMatch = lower.match(/(?:add|new|create)\s+(?:a\s+)?note\s+(.+)/i);
-  if (noteMatch) {
-    const noteText = capitalise(noteMatch[1]);
-    data.notes.push({ id: Date.now(), title: noteText, body: '', updated: Date.now() });
-    save(); renderAll();
-    textEl.textContent = '✓ Note added: ' + noteText;
-    return;
-  }
-
-  // If we couldn't parse it, add as a task by default
-  const fallbackText = capitalise(text);
-  data.tasks.unshift({ id: Date.now(), text: fallbackText, done: false, date: dateKey(today) });
-  save(); renderAll();
-  textEl.textContent = '✓ Added as task: ' + fallbackText;
-}
-
-function parseSpokenTime(timeStr) {
-  timeStr = timeStr.trim().toLowerCase();
-  let hours, minutes = 0;
-  const pmMatch = timeStr.includes('pm');
-  const amMatch = timeStr.includes('am');
-  const clean = timeStr.replace(/\s*(am|pm)\s*/i, '');
-
-  if (clean.includes(':')) {
-    const parts = clean.split(':');
-    hours = parseInt(parts[0]);
-    minutes = parseInt(parts[1]);
-  } else {
-    hours = parseInt(clean);
-  }
-
-  if (isNaN(hours)) return '';
-  if (pmMatch && hours < 12) hours += 12;
-  if (amMatch && hours === 12) hours = 0;
-
-  return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}`;
-}
-
-function capitalise(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 init();
 </script>
