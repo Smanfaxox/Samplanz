@@ -456,7 +456,7 @@
 <!-- TASKS TAB -->
 <div class="tab-content" id="tab-tasks">
   <div class="task-input-row">
-    <input type="text" id="taskInput" placeholder="What needs doing?" onkeydown="if(event.key==='Enter')addTask()">
+    <input type="text" id="taskInput" placeholder="What needs doing?" onkeydown="if(event.key==='Enter')addTask()" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences" enterkeyhint="done">
     <button onclick="addTask()">Add</button>
   </div>
   <div class="task-filters">
@@ -478,8 +478,8 @@
         <button class="note-save" onclick="saveCurrentNote()">Save</button>
       </div>
     </div>
-    <input type="text" id="noteTitle" placeholder="Title">
-    <textarea id="noteBody" placeholder="Start writing..."></textarea>
+    <input type="text" id="noteTitle" placeholder="Title" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
+    <textarea id="noteBody" placeholder="Start writing..." autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
   </div>
   <button class="add-note-btn" id="addNoteBtn" onclick="openNewNote()">+ New Note</button>
 </div>
@@ -525,7 +525,7 @@
   <div class="modal">
     <h3>New Event</h3>
     <label>Event name</label>
-    <input type="text" id="eventName" placeholder="e.g. Team standup">
+    <input type="text" id="eventName" placeholder="e.g. Team standup" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
     <label>Time</label>
     <input type="time" id="eventTime">
     <label>Colour</label>
@@ -542,7 +542,7 @@
   <div class="modal">
     <h3>New Habit</h3>
     <label>Habit name</label>
-    <input type="text" id="habitName" placeholder="e.g. Exercise, Read, Meditate">
+    <input type="text" id="habitName" placeholder="e.g. Exercise, Read, Meditate" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeHabitModal()">Cancel</button>
       <button class="modal-save" onclick="saveHabit()">Add Habit</button>
