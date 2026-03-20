@@ -88,7 +88,7 @@
   .weather-hi-lo .lo { color: var(--cyan); font-weight: 700; }
 
   /* Tab content */
-  .tab-content { display: none; padding: 8px 20px 20px; }
+  .tab-content { display: none; padding: 8px 20px 20px; position: relative; z-index: 1; transform: translateZ(0); }
   .tab-content.active { display: block; }
 
   /* Cards */
@@ -613,8 +613,9 @@
     display: flex; align-items: center; gap: 10px; cursor: pointer;
     animation: fabSlideUp 0.2s ease-out both;
   }
-  .fab-menu-item:nth-child(1) { animation-delay: 0.05s; }
-  .fab-menu-item:nth-child(2) { animation-delay: 0s; }
+  .fab-menu-item:nth-child(1) { animation-delay: 0.1s; }
+  .fab-menu-item:nth-child(2) { animation-delay: 0.05s; }
+  .fab-menu-item:nth-child(3) { animation-delay: 0s; }
   @keyframes fabSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .fab-menu-label {
     background: var(--card); color: var(--text); font-size: 13px; font-weight: 600;
@@ -628,6 +629,7 @@
   }
   .fab-menu-btn.event-btn { background: linear-gradient(135deg, var(--cyan), #0891b2); }
   .fab-menu-btn.appt-btn { background: linear-gradient(135deg, var(--accent), #6d28d9); }
+  .fab-menu-btn.note-btn { background: linear-gradient(135deg, var(--green), #059669); }
   .fab-overlay { position: fixed; inset: 0; z-index: 39; display: none; }
   .fab-overlay.active { display: block; }
 
@@ -661,10 +663,30 @@
 
   /* ===== DAY NOTES ===== */
   .day-notes-section { margin-top: 16px; }
+  .notes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .day-notes-label {
     font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-    color: var(--text-secondary); margin-bottom: 10px; padding-left: 2px;
+    color: var(--text-secondary); padding-left: 2px;
   }
+  .notes-recur-btn {
+    background: none; border: 1px solid var(--border); border-radius: 20px;
+    color: var(--text-secondary); font-size: 11px; font-weight: 700;
+    padding: 4px 10px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .notes-recur-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
+  .recur-picker {
+    display: none; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+    padding: 12px; background: var(--card); border-radius: 12px; border: 1px solid var(--border);
+  }
+  .recur-picker.open { display: flex; }
+  .recur-option {
+    padding: 7px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--bg-secondary); font-size: 13px; cursor: pointer;
+    color: var(--text); font-weight: 500; font-family: inherit;
+  }
+  .recur-option:active { background: var(--accent-light); }
+  .recur-option.remove { color: var(--red); border-color: rgba(239,68,68,0.3); }
   .day-notes-area {
     width: 100%; min-height: 100px; padding: 14px; border-radius: 12px;
     border: 1px solid var(--border); font-size: 15px; background: var(--bg-secondary);
@@ -694,9 +716,75 @@
     100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
   }
 
+  /* ===== AURORA ===== */
+  .aurora {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .aurora-blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(90px); opacity: 0.18;
+    will-change: transform;
+  }
+  .aurora-blob-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle at center, #7c3aed, transparent 70%);
+    top: -180px; left: -120px;
+    animation: aurora1 22s ease-in-out infinite;
+  }
+  .aurora-blob-2 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle at center, #ec4899, transparent 70%);
+    top: 25%; right: -140px;
+    animation: aurora2 28s ease-in-out infinite;
+  }
+  .aurora-blob-3 {
+    width: 380px; height: 380px;
+    background: radial-gradient(circle at center, #06b6d4, transparent 70%);
+    bottom: 5%; left: 10%;
+    animation: aurora3 20s ease-in-out infinite;
+  }
+  .aurora-blob-4 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle at center, #f97316, transparent 70%);
+    bottom: 30%; right: 5%;
+    animation: aurora4 24s ease-in-out infinite;
+    opacity: 0.1;
+  }
+  @keyframes aurora1 {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    25%       { transform: translate(80px, 120px) scale(1.15); }
+    50%       { transform: translate(160px, 40px) scale(0.95); }
+    75%       { transform: translate(40px, 180px) scale(1.1); }
+  }
+  @keyframes aurora2 {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    25%       { transform: translate(-120px, 80px) scale(1.2); }
+    50%       { transform: translate(-60px, -100px) scale(0.9); }
+    75%       { transform: translate(-160px, 40px) scale(1.05); }
+  }
+  @keyframes aurora3 {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    33%       { transform: translate(100px, -80px) scale(1.15); }
+    66%       { transform: translate(-70px, -120px) scale(0.88); }
+  }
+  @keyframes aurora4 {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    30%       { transform: translate(-90px, -60px) scale(1.2); }
+    60%       { transform: translate(-140px, 60px) scale(0.9); }
+  }
+
 </style>
 </head>
 <body>
+
+<!-- Aurora background -->
+<div class="aurora">
+  <div class="aurora-blob aurora-blob-1"></div>
+  <div class="aurora-blob aurora-blob-2"></div>
+  <div class="aurora-blob aurora-blob-3"></div>
+  <div class="aurora-blob aurora-blob-4"></div>
+</div>
 
 <div class="header">
   <div class="greeting" id="greeting"></div>
@@ -719,9 +807,9 @@
     <div class="weather-hi-lo" id="weatherHiLo"></div>
   </div>
   <div class="summary-row">
-    <div class="summary-card sc-tasks">
-      <div class="num" id="sumTasks">0</div>
-      <div class="label">Tasks</div>
+    <div class="summary-card sc-events" style="border-color:rgba(124,58,237,0.2);background:var(--accent-light);">
+      <div class="num" id="sumTasks" style="color:var(--accent);">0</div>
+      <div class="label">Appointments</div>
     </div>
     <div class="summary-card sc-events">
       <div class="num" id="sumEvents">0</div>
@@ -730,7 +818,16 @@
   </div>
   <div id="todayAgenda"></div>
   <div class="day-notes-section">
-    <div class="day-notes-label">Notes</div>
+    <div class="notes-header">
+      <div class="day-notes-label">Notes</div>
+      <button class="notes-recur-btn" id="todayNotesRecurBtn" onclick="toggleRecurPicker('todayNotes')">&#128257; Repeat</button>
+    </div>
+    <div class="recur-picker" id="todayNotesRecurPicker">
+      <button class="recur-option" onclick="setRecurring('todayNotes','weekly')">Every week</button>
+      <button class="recur-option" onclick="setRecurring('todayNotes','monthly')">Every month</button>
+      <button class="recur-option remove" onclick="removeRecurring('todayNotes')">Remove</button>
+      <button class="recur-option" onclick="closeRecurPicker('todayNotes')">Cancel</button>
+    </div>
     <textarea class="day-notes-area" id="todayNotes" placeholder="Other stuff..." oninput="saveDayNotes('todayNotes')" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
   </div>
 </div>
@@ -751,7 +848,16 @@
     <div id="weekTimeline"></div>
   </div>
   <div class="day-notes-section">
-    <div class="day-notes-label">Notes</div>
+    <div class="notes-header">
+      <div class="day-notes-label">Notes</div>
+      <button class="notes-recur-btn" id="weekNotesRecurBtn" onclick="toggleRecurPicker('weekNotes')">&#128257; Repeat</button>
+    </div>
+    <div class="recur-picker" id="weekNotesRecurPicker">
+      <button class="recur-option" onclick="setRecurring('weekNotes','weekly')">Every week</button>
+      <button class="recur-option" onclick="setRecurring('weekNotes','monthly')">Every month</button>
+      <button class="recur-option remove" onclick="removeRecurring('weekNotes')">Remove</button>
+      <button class="recur-option" onclick="closeRecurPicker('weekNotes')">Cancel</button>
+    </div>
     <textarea class="day-notes-area" id="weekNotes" placeholder="Other stuff..." oninput="saveDayNotes('weekNotes')" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"></textarea>
   </div>
 </div>
@@ -845,6 +951,10 @@
     <span class="fab-menu-label">Event</span>
     <button class="fab-menu-btn event-btn">&#9733;</button>
   </div>
+  <div class="fab-menu-item" onclick="closeFabMenu(); openNoteModal();">
+    <span class="fab-menu-label">Note</span>
+    <button class="fab-menu-btn note-btn">&#128221;</button>
+  </div>
 </div>
 <button class="fab" id="fabBtn" onclick="toggleFabMenu()">+</button>
 
@@ -931,6 +1041,21 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="noteModal">
+  <div class="modal">
+    <h3>Add Note</h3>
+    <label>Date</label>
+    <input type="date" id="noteModalDate">
+    <label>Note</label>
+    <textarea id="noteModalText" placeholder="Write your note..." autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences"
+      style="width:100%;min-height:100px;padding:12px 14px;border-radius:12px;border:1px solid var(--border);font-size:15px;margin-bottom:14px;font-family:inherit;background:var(--bg-secondary);outline:none;color:var(--text);resize:vertical;line-height:1.6;"></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeNoteModal()">Cancel</button>
+      <button class="modal-save" style="background:linear-gradient(135deg,var(--green),#059669);" onclick="saveNoteFromModal()">Add Note</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== DATA =====
 const STORAGE_KEY = 'samplanzData';
@@ -945,30 +1070,102 @@ if (!data.shopping) data.shopping = [];
 if (!data.cleaning) data.cleaning = [];
 if (!data.appointments) data.appointments = [];
 if (!data.dayNotes) data.dayNotes = {};
+if (!data.recurringNotes) {
+  data.recurringNotes = [{ id: 1, type: 'weekly', dayOfWeek: 1, text: 'Mum and Dad - Tablets' }];
+  save();
+}
+
+// ===== RECURRING NOTES =====
+function getRecurringNote(dateStr) {
+  if (!data.recurringNotes) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  return data.recurringNotes.find(r =>
+    (r.type === 'weekly' && r.dayOfWeek === d.getDay()) ||
+    (r.type === 'monthly' && r.dayOfMonth === d.getDate())
+  ) || null;
+}
+
+function getDateForTextarea(textareaId) {
+  return textareaId === 'todayNotes' ? dateKey(today) : weekSelectedDate;
+}
+
+function loadNoteIntoTextarea(textareaId, dateStr) {
+  let val = '';
+  if (dateStr in data.dayNotes) {
+    val = data.dayNotes[dateStr];
+  } else {
+    const rec = getRecurringNote(dateStr);
+    if (rec) val = rec.text;
+  }
+  document.getElementById(textareaId).value = val;
+  updateRecurBtn(textareaId, dateStr);
+}
+
+function updateRecurBtn(textareaId, dateStr) {
+  const btn = document.getElementById(textareaId + 'RecurBtn');
+  if (!btn) return;
+  const rec = getRecurringNote(dateStr);
+  if (rec) {
+    btn.classList.add('active');
+    btn.innerHTML = '&#128257; ' + (rec.type === 'weekly' ? 'Weekly' : 'Monthly');
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '&#128257; Repeat';
+  }
+}
+
+function toggleRecurPicker(textareaId) {
+  const picker = document.getElementById(textareaId + 'RecurPicker');
+  picker.classList.toggle('open');
+}
+
+function closeRecurPicker(textareaId) {
+  document.getElementById(textareaId + 'RecurPicker').classList.remove('open');
+}
+
+function setRecurring(textareaId, type) {
+  const dateStr = getDateForTextarea(textareaId);
+  const text = document.getElementById(textareaId).value.trim();
+  if (!text) { alert('Please add a note first, then set it as recurring.'); return; }
+  const d = new Date(dateStr + 'T00:00:00');
+  // Remove existing recurring for the same pattern
+  data.recurringNotes = data.recurringNotes.filter(r =>
+    !(r.type === 'weekly' && type === 'weekly' && r.dayOfWeek === d.getDay()) &&
+    !(r.type === 'monthly' && type === 'monthly' && r.dayOfMonth === d.getDate())
+  );
+  if (type === 'weekly') {
+    data.recurringNotes.push({ id: Date.now(), type: 'weekly', dayOfWeek: d.getDay(), text });
+  } else {
+    data.recurringNotes.push({ id: Date.now(), type: 'monthly', dayOfMonth: d.getDate(), text });
+  }
+  save();
+  closeRecurPicker(textareaId);
+  updateRecurBtn(textareaId, dateStr);
+}
+
+function removeRecurring(textareaId) {
+  const dateStr = getDateForTextarea(textareaId);
+  const d = new Date(dateStr + 'T00:00:00');
+  data.recurringNotes = data.recurringNotes.filter(r =>
+    !(r.type === 'weekly' && r.dayOfWeek === d.getDay()) &&
+    !(r.type === 'monthly' && r.dayOfMonth === d.getDate())
+  );
+  save();
+  closeRecurPicker(textareaId);
+  updateRecurBtn(textareaId, dateStr);
+}
 
 // ===== DAY NOTES =====
 function saveDayNotes(textareaId) {
-  const key = textareaId === 'todayNotes' ? dateKey(today) : weekSelectedDate;
+  const key = getDateForTextarea(textareaId);
   data.dayNotes[key] = document.getElementById(textareaId).value;
   save();
 }
 
-function applyMondayDefault(key) {
-  if (!(key in data.dayNotes)) {
-    const d = new Date(key + 'T00:00:00');
-    if (d.getDay() === 1) { // Monday
-      data.dayNotes[key] = 'Mum and Dad - Tablets';
-      save();
-    }
-  }
-}
-
 function loadDayNotes() {
   const todayKey = dateKey(today);
-  applyMondayDefault(todayKey);
-  applyMondayDefault(weekSelectedDate);
-  document.getElementById('todayNotes').value = data.dayNotes[todayKey] || '';
-  document.getElementById('weekNotes').value = data.dayNotes[weekSelectedDate] || '';
+  loadNoteIntoTextarea('todayNotes', todayKey);
+  loadNoteIntoTextarea('weekNotes', weekSelectedDate);
 }
 
 // ===== STATE =====
@@ -1176,7 +1373,6 @@ function renderAll() {
   renderTodayAgenda();
   renderWeek();
   renderCalendar();
-  renderTasks();
   renderAppointments();
   renderShopping();
   renderCleaning();
@@ -1246,6 +1442,27 @@ function saveApptFromModal() {
   data.appointments.push({ id: Date.now(), title, time, date });
   data.appointments.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   save(); closeApptModal(); renderAll();
+}
+
+// ===== NOTE MODAL =====
+function openNoteModal() {
+  document.getElementById('noteModal').classList.add('active');
+  document.getElementById('noteModalDate').value = getContextDate();
+  document.getElementById('noteModalText').focus();
+}
+function closeNoteModal() {
+  document.getElementById('noteModal').classList.remove('active');
+  document.getElementById('noteModalText').value = '';
+}
+function saveNoteFromModal() {
+  const text = document.getElementById('noteModalText').value.trim();
+  const date = document.getElementById('noteModalDate').value;
+  if (!text || !date) return;
+  const existing = data.dayNotes[date] || '';
+  data.dayNotes[date] = existing ? existing + '\n' + text : text;
+  save();
+  closeNoteModal();
+  loadDayNotes();
 }
 
 // ===== TODAY AGENDA =====
@@ -1326,7 +1543,7 @@ function renderWeek() {
     const key = dateKey(d);
     const isToday = key === todayKey;
     const isSelected = key === weekSelectedDate;
-    const hasEvents = (data.events[key] && data.events[key].length > 0) || data.appointments.some(a => a.date === key);
+    const hasEvents = (data.events[key] && data.events[key].length > 0) || data.appointments.some(a => a.date === key) || !!(data.dayNotes[key] && data.dayNotes[key].trim()) || !!getRecurringNote(key);
     stripHtml += `<div class="week-day-card ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasEvents ? 'has-entries' : ''}" onclick="selectWeekDay('${key}')">
       <div class="wday">${d.toLocaleDateString('en-GB', { weekday: 'short' })}</div>
       <div class="wdate">${d.getDate()}</div>
@@ -1393,8 +1610,7 @@ function renderWeek() {
 function selectWeekDay(key) {
   weekSelectedDate = key;
   renderWeek();
-  applyMondayDefault(key);
-  document.getElementById('weekNotes').value = data.dayNotes[key] || '';
+  loadNoteIntoTextarea('weekNotes', key);
 }
 
 // ===== CALENDAR =====
@@ -1435,7 +1651,7 @@ function renderCalendar() {
     el.className = 'cal-day';
     if (key === todayKey) el.classList.add('today');
     if (key === selectedDate) el.classList.add('selected');
-    const hasEntries = (data.events[key] && data.events[key].length > 0) || data.appointments.some(a => a.date === key);
+    const hasEntries = (data.events[key] && data.events[key].length > 0) || data.appointments.some(a => a.date === key) || !!(data.dayNotes[key] && data.dayNotes[key].trim()) || !!getRecurringNote(key);
     if (hasEntries) el.classList.add('has-entries');
     el.textContent = d;
     if (hasEntries) {
@@ -1487,7 +1703,16 @@ function renderDayEvents() {
     html += '</div>';
   }
 
-  if (!events.length && !appts.length) {
+  const noteText = data.dayNotes[selectedDate] || (getRecurringNote(selectedDate) ? getRecurringNote(selectedDate).text : '');
+  if (noteText.trim()) {
+    html += `<div class="agenda-section"><h3>Notes</h3>
+      <div class="agenda-item" style="align-items:flex-start;">
+        <div class="agenda-icon" style="background:rgba(16,185,129,0.15);margin-top:2px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--green)"></div></div>
+        <div class="agenda-text"><div class="title" style="white-space:pre-wrap;line-height:1.6;">${escHtml(noteText)}</div></div>
+      </div></div>`;
+  }
+
+  if (!events.length && !appts.length && !noteText.trim()) {
     html = '<div class="empty-state" style="padding:20px 0;"><div class="emoji">&#128197;</div><p>Nothing planned for this day. Tap + to add an event.</p></div>';
   }
 
@@ -1971,7 +2196,7 @@ function renderCleaning() {
 // ===== SUMMARY =====
 function updateSummary() {
   const todayKey = dateKey(today);
-  document.getElementById('sumTasks').textContent = data.tasks.filter(t => !t.done).length;
+  document.getElementById('sumTasks').textContent = data.appointments.filter(a => a.date === todayKey).length;
   document.getElementById('sumEvents').textContent = (data.events[todayKey] || []).length;
 }
 
@@ -1980,6 +2205,7 @@ function escHtml(str) { const d = document.createElement('div'); d.textContent =
 
 // Close modals on backdrop
 document.getElementById('eventModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.getElementById('noteModal').addEventListener('click', function(e) { if (e.target === this) closeNoteModal(); });
 
 init();
 </script>
