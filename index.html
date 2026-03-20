@@ -781,14 +781,11 @@ function renderTodayAgenda() {
   }
 
   if (shopItems.length > 0) {
-    html += '<div class="agenda-section"><h3>Shopping List</h3>';
-    shopItems.slice(0, 5).forEach(s => {
-      html += `<div class="agenda-item" onclick="toggleShopItem(${s.id}); renderAll();">
-        <div class="agenda-icon" style="background:var(--green-light);"><div style="width:10px;height:10px;border-radius:50%;border:2px solid var(--green)"></div></div>
-        <div class="agenda-text"><div class="title">${escHtml(s.text)}</div><div class="subtitle">Tap to tick off</div></div>
-      </div>`;
-    });
-    if (shopItems.length > 5) html += `<div style="text-align:center;padding:8px;color:var(--text-secondary);font-size:13px;">+${shopItems.length - 5} more items</div>`;
+    html += '<div class="agenda-section"><h3>Shopping</h3>';
+    html += `<div class="agenda-item" onclick="switchTab('shopping');" style="cursor:pointer;">
+      <div class="agenda-icon" style="background:var(--green-light);"><div style="width:10px;height:10px;border-radius:50%;background:var(--green)"></div></div>
+      <div class="agenda-text"><div class="title">${shopItems.length} item${shopItems.length !== 1 ? 's' : ''} on your list</div><div class="subtitle">Tap to view</div></div>
+    </div>`;
     html += '</div>';
   }
 
