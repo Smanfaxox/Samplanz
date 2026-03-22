@@ -2594,51 +2594,24 @@ function toggleCleanTask(id) {
 }
 
 function launchConfetti() {
-  const colors = ['#7c3aed','#ec4899','#06b6d4','#10b981','#f97316','#facc15','#ef4444','#8b5cf6','#fff'];
-  const container = document.createElement('div');
-  container.className = 'confetti-container';
-  document.body.appendChild(container);
-
-  const pieces = Array.from({ length: 60 }, () => {
-    const el = document.createElement('div');
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const size = 6 + Math.random() * 8;
-    const isCircle = Math.random() > 0.66;
-    const isRect = !isCircle && Math.random() > 0.5;
-    el.style.cssText = `position:absolute;width:${isRect ? size*0.5 : size}px;height:${size}px;background:${color};border-radius:${isCircle ? '50%' : '2px'};`;
-    container.appendChild(el);
-    return {
-      el,
-      x: Math.random() * window.innerWidth,
-      y: -20,
-      vx: (Math.random() - 0.5) * 4,
-      vy: 1.5 + Math.random() * 3,
-      rot: Math.random() * 360,
-      rotV: (Math.random() - 0.5) * 12,
-      delayFrames: Math.floor(Math.random() * 20),
-      opacity: 1
-    };
-  });
-
-  let frame = 0;
-  function animate() {
-    frame++;
-    let alive = false;
-    pieces.forEach(p => {
-      if (frame < p.delayFrames) { alive = true; return; }
-      p.vy += 0.12;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.rot += p.rotV;
-      if (p.y > window.innerHeight * 0.8) p.opacity = Math.max(0, p.opacity - 0.04);
-      if (p.opacity > 0) alive = true;
-      p.el.style.transform = `translate(${p.x}px,${p.y}px) rotate(${p.rot}deg)`;
-      p.el.style.opacity = p.opacity;
-    });
-    if (alive && frame < 300) requestAnimationFrame(animate);
-    else container.remove();
+  const emojis = ['🎉','✨','🌸','💜','⭐','🥳','💫','🎊','🌟','💕','🦋','🍀'];
+  for (let i = 0; i < 14; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      const x = 4 + Math.random() * 88;
+      const size = 28 + Math.random() * 28;
+      const dur = 1.6 + Math.random() * 1.2;
+      const fall = 65 + Math.random() * 25;
+      el.style.cssText = 'position:fixed;left:' + x + '%;top:-10px;font-size:' + size + 'px;z-index:99999;pointer-events:none;opacity:1;transition:transform ' + dur + 's ease-in,opacity ' + dur + 's ease-in;';
+      document.documentElement.appendChild(el);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.transform = 'translateY(' + fall + 'vh)';
+        el.style.opacity = '0';
+      }));
+      setTimeout(() => el.remove(), (dur + 0.3) * 1000);
+    }, i * 80);
   }
-  requestAnimationFrame(animate);
 }
 
 function deleteCleanTask(id) {
