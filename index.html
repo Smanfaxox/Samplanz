@@ -2595,22 +2595,34 @@ function toggleCleanTask(id) {
 
 function launchConfetti() {
   const emojis = ['🎉','✨','🌸','💜','⭐','🥳','💫','🎊','🌟','💕','🦋','🍀'];
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 12; i++) {
     setTimeout(() => {
       const el = document.createElement('div');
       el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      const x = 4 + Math.random() * 88;
-      const size = 28 + Math.random() * 28;
-      const dur = 1.6 + Math.random() * 1.2;
-      const fall = 65 + Math.random() * 25;
-      el.style.cssText = 'position:fixed;left:' + x + '%;top:-10px;font-size:' + size + 'px;z-index:99999;pointer-events:none;opacity:1;transition:transform ' + dur + 's ease-in,opacity ' + dur + 's ease-in;';
+      const x = 5 + Math.random() * 82;
+      const y = 8 + Math.random() * 72;
+      const size = 32 + Math.random() * 26;
+      el.style.position = 'fixed';
+      el.style.left = x + '%';
+      el.style.top = y + '%';
+      el.style.fontSize = size + 'px';
+      el.style.zIndex = '99999';
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0';
+      el.style.transform = 'scale(0.3)';
+      el.style.transition = 'opacity 0.3s, transform 0.3s';
       document.documentElement.appendChild(el);
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        el.style.transform = 'translateY(' + fall + 'vh)';
-        el.style.opacity = '0';
+        el.style.opacity = '1';
+        el.style.transform = 'scale(1)';
       }));
-      setTimeout(() => el.remove(), (dur + 0.3) * 1000);
-    }, i * 80);
+      const stayFor = 700 + Math.random() * 600;
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'scale(0.3)';
+        setTimeout(() => el.remove(), 350);
+      }, stayFor);
+    }, i * 120);
   }
 }
 
