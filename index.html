@@ -928,17 +928,7 @@
   /* ===== CONFETTI ===== */
   .confetti-container {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 9999; overflow: hidden;
-  }
-  .confetti-piece {
-    position: absolute; top: -20px;
-    width: 10px; height: 10px; border-radius: 2px;
-    animation: confettiFall linear forwards;
-  }
-  @keyframes confettiFall {
-    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-    80% { opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
+    pointer-events: none; z-index: 9999;
   }
 
   /* ===== AURORA ===== */
@@ -1132,6 +1122,19 @@
   <div class="card" id="cleanList"></div>
 </div>
 
+<div class="tab-content" id="tab-selfcare">
+  <div class="clean-progress" id="selfcareProgress"></div>
+  <div class="clean-input-row">
+    <input type="text" id="selfcareInput" placeholder="Add a self care task..." onkeydown="if(event.key==='Enter')addSelfCareTask()" autocomplete="off" autocorrect="on" spellcheck="true" autocapitalize="sentences">
+    <button onclick="addSelfCareTask()">Add</button>
+  </div>
+  <div class="clean-actions">
+    <button class="clean-action" onclick="resetSelfCareTasks()">Reset all</button>
+    <button class="clean-action" onclick="removeAllSelfCareTasks()">Remove all</button>
+  </div>
+  <div class="card" id="selfcareList"></div>
+</div>
+
 <!-- Photo viewer -->
 <div class="photo-viewer" id="photoViewer" onclick="closePhotoViewer()">
   <button class="photo-viewer-close" onclick="closePhotoViewer()">&times;</button>
@@ -1182,6 +1185,10 @@
   <button class="nav-item" onclick="switchTab('cleaning')" id="nav-cleaning">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22v-2a4 4 0 014-4h2"/><path d="M9 16l-3-3 9-9 3 3-9 9z"/><path d="M14.5 5.5l3 3"/><path d="M18 2l4 4"/></svg>
     Clean
+  </button>
+  <button class="nav-item" onclick="switchTab('selfcare')" id="nav-selfcare">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    Self Care
   </button>
   <button class="nav-item" onclick="window.open('https://docs.google.com/spreadsheets/d/15eYBIZ7DWWZGUmUkYtIt_5jANzy5M53rZwxItHebTes/edit?pli=1&gid=1659577070#gid=1659577070', '_blank')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
@@ -1325,12 +1332,13 @@ const STORAGE_KEY = 'samplanzData';
 let data = loadData();
 function loadData() {
   try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
-  return { events: {}, tasks: [], appointments: [], shopping: [], cleaning: [] };
+  return { events: {}, tasks: [], appointments: [], shopping: [], cleaning: [], selfcare: [] };
 }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 // Migrate old data
 if (!data.shopping) data.shopping = [];
 if (!data.cleaning) data.cleaning = [];
+if (!data.selfcare) data.selfcare = [];
 if (!data.appointments) data.appointments = [];
 if (!data.dayNotes) data.dayNotes = {};
 if (!data.recurringNotes) {
@@ -1679,6 +1687,7 @@ function renderAll() {
   renderAppointments();
   renderShopping();
   renderCleaning();
+  renderSelfCare();
   updateSummary();
   loadDayNotes();
   if (document.getElementById('dayDetailOverlay') &&
@@ -1817,7 +1826,7 @@ function switchTab(tab) {
   const fab = document.getElementById('fabBtn');
   fab.style.display = (tab === 'today' || tab === 'calendar' || tab === 'week') ? 'flex' : 'none';
 
-  const titles = { today: 'Samplanz', week: 'Weekly Planner', calendar: 'Calendar', tasks: 'Tasks', appointments: 'Appointments', shopping: 'Shopping List', cleaning: 'Cleaning' };
+  const titles = { today: 'Samplanz', week: 'Weekly Planner', calendar: 'Calendar', tasks: 'Tasks', appointments: 'Appointments', shopping: 'Shopping List', cleaning: 'Cleaning', selfcare: 'Self Care' };
   document.getElementById('headerTitle').textContent = titles[tab];
   document.getElementById('greeting').style.display = tab === 'today' ? 'block' : 'none';
 }
@@ -2585,27 +2594,51 @@ function toggleCleanTask(id) {
 }
 
 function launchConfetti() {
+  const colors = ['#7c3aed','#ec4899','#06b6d4','#10b981','#f97316','#facc15','#ef4444','#8b5cf6','#fff'];
   const container = document.createElement('div');
   container.className = 'confetti-container';
   document.body.appendChild(container);
-  const colors = ['#7c3aed','#ec4899','#06b6d4','#10b981','#f97316','#facc15','#ef4444','#8b5cf6','#fff'];
-  const shapes = ['square','circle','rect'];
-  for (let i = 0; i < 60; i++) {
-    const piece = document.createElement('div');
-    piece.className = 'confetti-piece';
+
+  const pieces = Array.from({ length: 60 }, () => {
+    const el = document.createElement('div');
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const shape = shapes[Math.floor(Math.random() * shapes.length)];
     const size = 6 + Math.random() * 8;
-    piece.style.left = Math.random() * 100 + '%';
-    piece.style.background = color;
-    piece.style.width = shape === 'rect' ? size * 0.5 + 'px' : size + 'px';
-    piece.style.height = size + 'px';
-    piece.style.borderRadius = shape === 'circle' ? '50%' : '2px';
-    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
-    piece.style.animationDelay = Math.random() * 0.5 + 's';
-    container.appendChild(piece);
+    const isCircle = Math.random() > 0.66;
+    const isRect = !isCircle && Math.random() > 0.5;
+    el.style.cssText = `position:absolute;width:${isRect ? size*0.5 : size}px;height:${size}px;background:${color};border-radius:${isCircle ? '50%' : '2px'};`;
+    container.appendChild(el);
+    return {
+      el,
+      x: Math.random() * window.innerWidth,
+      y: -20,
+      vx: (Math.random() - 0.5) * 4,
+      vy: 1.5 + Math.random() * 3,
+      rot: Math.random() * 360,
+      rotV: (Math.random() - 0.5) * 12,
+      delayFrames: Math.floor(Math.random() * 20),
+      opacity: 1
+    };
+  });
+
+  let frame = 0;
+  function animate() {
+    frame++;
+    let alive = false;
+    pieces.forEach(p => {
+      if (frame < p.delayFrames) { alive = true; return; }
+      p.vy += 0.12;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.rotV;
+      if (p.y > window.innerHeight * 0.8) p.opacity = Math.max(0, p.opacity - 0.04);
+      if (p.opacity > 0) alive = true;
+      p.el.style.transform = `translate(${p.x}px,${p.y}px) rotate(${p.rot}deg)`;
+      p.el.style.opacity = p.opacity;
+    });
+    if (alive && frame < 300) requestAnimationFrame(animate);
+    else container.remove();
   }
-  setTimeout(() => container.remove(), 4000);
+  requestAnimationFrame(animate);
 }
 
 function deleteCleanTask(id) {
@@ -2621,6 +2654,83 @@ function resetCleanTasks() {
 function removeAllCleanTasks() {
   data.cleaning = [];
   save(); renderAll();
+}
+
+// ===== SELF CARE =====
+function addSelfCareTask() {
+  const input = document.getElementById('selfcareInput');
+  const text = input.value.trim();
+  if (!text) return;
+  data.selfcare.push({ id: Date.now(), text, done: false });
+  save(); input.value = ''; renderAll();
+}
+
+function toggleSelfCareTask(id) {
+  const task = data.selfcare.find(c => c.id === id);
+  if (!task) return;
+  const wasIncomplete = !task.done;
+  task.done = !task.done;
+  save(); renderAll();
+  if (wasIncomplete) launchConfetti();
+}
+
+function deleteSelfCareTask(id) {
+  data.selfcare = data.selfcare.filter(c => c.id !== id);
+  save(); renderAll();
+}
+
+function resetSelfCareTasks() {
+  data.selfcare.forEach(t => t.done = false);
+  save(); renderAll();
+}
+
+function removeAllSelfCareTasks() {
+  data.selfcare = [];
+  save(); renderAll();
+}
+
+function renderSelfCare() {
+  const list = document.getElementById('selfcareList');
+  const progressEl = document.getElementById('selfcareProgress');
+  if (!list) return;
+
+  if (data.selfcare.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">🌸</div><p>Add your self care tasks and check them off as you go!</p></div>';
+    progressEl.innerHTML = '';
+    return;
+  }
+
+  const total = data.selfcare.length;
+  const done = data.selfcare.filter(c => c.done).length;
+  const pct = Math.round((done / total) * 100);
+
+  progressEl.innerHTML = `
+    <div class="clean-progress-text">${done}/${total} done${pct === 100 ? ' \u2014 you\'re glowing! \u2728' : ''}</div>
+    <div class="clean-progress-bar"><div class="clean-progress-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--pink),var(--accent))"></div></div>
+  `;
+
+  const undone = data.selfcare.filter(c => !c.done);
+  const completed = data.selfcare.filter(c => c.done);
+
+  let html = '';
+  undone.forEach(c => {
+    html += `<div class="clean-item">
+      <div class="clean-check" onclick="toggleSelfCareTask(${c.id})"></div>
+      <div class="clean-text">${escHtml(c.text)}</div>
+      <button class="clean-delete" onclick="deleteSelfCareTask(${c.id})">\u00d7</button>
+    </div>`;
+  });
+  if (completed.length > 0) {
+    html += `<div style="font-size:12px;color:var(--text-secondary);font-weight:600;padding:12px 0 6px;text-transform:uppercase;">Done (${completed.length})</div>`;
+    completed.forEach(c => {
+      html += `<div class="clean-item">
+        <div class="clean-check checked" onclick="toggleSelfCareTask(${c.id})"></div>
+        <div class="clean-text done">${escHtml(c.text)}</div>
+        <button class="clean-delete" onclick="deleteSelfCareTask(${c.id})">\u00d7</button>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
 }
 
 function renderCleaning() {
