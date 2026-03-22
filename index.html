@@ -611,7 +611,7 @@
   .clean-input-row input::placeholder { color: var(--text-secondary); }
   .clean-input-row button {
     padding: 12px 20px; border-radius: 12px; border: none;
-    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    background: linear-gradient(135deg, var(--pink), var(--accent));
     color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
   }
   .clean-input-row button:active { opacity: 0.85; }
@@ -627,7 +627,7 @@
     flex-shrink: 0; transition: all 0.2s;
   }
   .clean-check.checked {
-    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    background: linear-gradient(135deg, var(--pink), var(--accent));
     border-color: transparent;
   }
   .clean-check.checked::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 800; }
@@ -649,7 +649,7 @@
   }
   .clean-progress-fill {
     height: 100%; border-radius: 4px;
-    background: linear-gradient(135deg, var(--orange), var(--yellow));
+    background: linear-gradient(135deg, var(--pink), var(--accent));
     transition: width 0.3s ease;
   }
   .clean-progress-text { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
@@ -2589,41 +2589,33 @@ function toggleCleanTask(id) {
   if (!task) return;
   const wasIncomplete = task.completedWeek !== currentWeekSat;
   task.completedWeek = task.completedWeek === currentWeekSat ? null : currentWeekSat;
-  save(); renderAll();
   if (wasIncomplete) launchConfetti();
+  save(); renderAll();
 }
 
 function launchConfetti() {
-  const emojis = ['🎉','✨','🌸','💜','⭐','🥳','💫','🎊','🌟','💕','🦋','🍀'];
-  for (let i = 0; i < 12; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      const x = 5 + Math.random() * 82;
-      const y = 8 + Math.random() * 72;
-      const size = 32 + Math.random() * 26;
-      el.style.position = 'fixed';
-      el.style.left = x + '%';
-      el.style.top = y + '%';
-      el.style.fontSize = size + 'px';
-      el.style.zIndex = '99999';
-      el.style.pointerEvents = 'none';
-      el.style.opacity = '0';
-      el.style.transform = 'scale(0.3)';
-      el.style.transition = 'opacity 0.3s, transform 0.3s';
-      document.documentElement.appendChild(el);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        el.style.opacity = '1';
-        el.style.transform = 'scale(1)';
-      }));
-      const stayFor = 700 + Math.random() * 600;
-      setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transform = 'scale(0.3)';
-        setTimeout(() => el.remove(), 350);
-      }, stayFor);
-    }, i * 120);
-  }
+  const items = [
+    { msg: '🎉 Well done! 🎉', bg: 'linear-gradient(135deg,#7c3aed,#ec4899)' },
+    { msg: '✨ You did it! ✨', bg: 'linear-gradient(135deg,#06b6d4,#7c3aed)' },
+    { msg: '🌸 Amazing! 🌸',   bg: 'linear-gradient(135deg,#ec4899,#f97316)' },
+    { msg: '💜 Go you! 💜',    bg: 'linear-gradient(135deg,#8b5cf6,#06b6d4)' },
+    { msg: '⭐ Nailed it! ⭐', bg: 'linear-gradient(135deg,#f97316,#facc15)' },
+    { msg: '🥳 Yes!! 🥳',      bg: 'linear-gradient(135deg,#10b981,#06b6d4)' },
+  ];
+  const item = items[Math.floor(Math.random() * items.length)];
+  const el = document.createElement('div');
+  el.textContent = item.msg;
+  el.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%) scale(0.8);background:' + item.bg + ';color:#fff;padding:20px 36px;border-radius:28px;font-size:24px;font-weight:900;z-index:99999;pointer-events:none;opacity:0;transition:opacity 0.25s,transform 0.25s;font-family:-apple-system,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.35);white-space:nowrap;';
+  document.documentElement.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateX(-50%) scale(1)';
+  }));
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) scale(0.8)';
+    setTimeout(() => el.remove(), 300);
+  }, 2000);
 }
 
 function deleteCleanTask(id) {
@@ -2655,8 +2647,8 @@ function toggleSelfCareTask(id) {
   if (!task) return;
   const wasIncomplete = !task.done;
   task.done = !task.done;
-  save(); renderAll();
   if (wasIncomplete) launchConfetti();
+  save(); renderAll();
 }
 
 function deleteSelfCareTask(id) {
