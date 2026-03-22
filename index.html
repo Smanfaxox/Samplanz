@@ -1823,6 +1823,9 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('nav-' + tab).classList.add('active');
 
+  if (tab === 'week') { weekStart = getMonday(today); renderWeek(); }
+  if (tab === 'calendar') { calYear = today.getFullYear(); calMonth = today.getMonth(); renderCalendar(); }
+
   const fab = document.getElementById('fabBtn');
   fab.style.display = (tab === 'today' || tab === 'calendar' || tab === 'week') ? 'flex' : 'none';
 
