@@ -931,6 +931,26 @@
     pointer-events: none; z-index: 9999;
   }
 
+  /* ===== CONFETTI RAINFALL ===== */
+  .confetti-piece {
+    position: fixed;
+    top: -20px;
+    width: 10px;
+    height: 14px;
+    pointer-events: none;
+    z-index: 99998;
+    opacity: 0.9;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+    20%  { opacity: 1; }
+    85%  { opacity: 0.7; }
+    100% { transform: translateY(105vh) rotate(var(--spin, 720deg)) scale(0.4); opacity: 0; }
+  }
+
   /* ===== AURORA ===== */
   .aurora {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -2619,6 +2639,40 @@ function launchConfetti() {
     el.style.transform = 'translateX(-50%) scale(0.8)';
     setTimeout(() => el.remove(), 300);
   }, 2000);
+
+  // Confetti rainfall
+  const confettiColors = ['#7c3aed','#ec4899','#06b6d4','#f97316','#facc15','#10b981','#ef4444','#8b5cf6','#ff6b9d','#00d2ff'];
+  const shapes = ['square','rect','circle'];
+  const count = 60;
+
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const left = Math.random() * 100;
+    const delay = Math.random() * 1.2;
+    const duration = 2.2 + Math.random() * 1.8;
+    const spin = 360 + Math.random() * 720;
+    const wobble = (Math.random() - 0.5) * 120;
+    const w = shape === 'rect' ? (6 + Math.random() * 4) : (8 + Math.random() * 6);
+    const h = shape === 'rect' ? (12 + Math.random() * 6) : w;
+    const radius = shape === 'circle' ? '50%' : '2px';
+
+    piece.style.cssText = `
+      left: ${left}%;
+      width: ${w}px;
+      height: ${h}px;
+      background: ${color};
+      border-radius: ${radius};
+      animation-delay: ${delay}s;
+      animation-duration: ${duration}s;
+      --spin: ${spin}deg;
+    `;
+
+    document.documentElement.appendChild(piece);
+    setTimeout(() => piece.remove(), (delay + duration) * 1000 + 200);
+  }
 }
 
 function deleteCleanTask(id) {
